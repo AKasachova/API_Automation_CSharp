@@ -80,13 +80,4 @@ namespace APIAutomation
     }
 }
 
-//Use for Debugging. To delete after tests implementation
-public static class Test_For_Auth_Check
-{
-    [Test]
-    public static void Test1()
-    {
-        var client = ClientForWriteScope.GetInstance("http://localhost:50990", "0oa157tvtugfFXEhU4x7", "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq");
-        var restClient = client.GetRestClient();
-    }
-}
+
