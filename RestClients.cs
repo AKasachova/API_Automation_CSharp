@@ -14,7 +14,7 @@ namespace APIAutomation
         {
             var options = new RestClientOptions(baseURL)
             {
-                Authenticator = new BasicAuthenticator(baseURL, clientUsername, clientPassword, "write")
+                Authenticator = new BasicAuthenticator(baseURL, clientUsername, clientPassword, Scope.write)
             };
 
             _client = new RestClient(options);
@@ -52,7 +52,7 @@ namespace APIAutomation
         {
             var options = new RestClientOptions(baseURL)
             {
-                Authenticator = new BasicAuthenticator(baseURL, clientUsername, clientPassword, "read")
+                Authenticator = new BasicAuthenticator(baseURL, clientUsername, clientPassword, Scope.read)
             };
 
             _client = new RestClient(options);
