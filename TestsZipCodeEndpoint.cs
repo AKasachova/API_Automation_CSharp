@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using RestSharp;
+using System.Net;
 
 namespace APIAutomation.Tests
 {
@@ -20,7 +21,7 @@ namespace APIAutomation.Tests
         }
 
         [Test]
-        public void GetAllZipCodes_ReturnsAllAvailableZipCodes()
+        public void GetAllZipCodes_ReturnsAllAvailableZipCodes_Test()
         {
 
             _client.AddDefaultHeader("Accept", "application/json");
@@ -31,8 +32,7 @@ namespace APIAutomation.Tests
 
             Assert.Multiple(() =>
             {
-                //The test fails, Status Code for successful Get Method equals 201
-                Assert.That((int)response.StatusCode, Is.EqualTo(200));
+                Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
                 Assert.That(expectedZipCodes.Count, Is.EqualTo(actualZipCodes.Count), "Number of zip codes in response doesn't match expected count!");
                 Assert.That(actualZipCodes.Distinct().Count(), Is.EqualTo(expectedZipCodes.Count), "Response contains duplicate zip codes.");
 
@@ -41,19 +41,6 @@ namespace APIAutomation.Tests
                     CollectionAssert.Contains(expectedZipCodes, zipCode, $"Unexpected zip code '{zipCode}' found in response.");
                 }
             });
-
-            /*Bug: The system displays 201 status code for GET request
-             * 
-             * Preconditions:
-             * -the user is authorized
-             * -have  available zip codes in the app
-             * 
-             * Steps:
-             * 1. Send GET request to /zip-codes endpoint 
-             * 
-             * Expected result: success code 200 is returned
-             * Actual result: success code 201 is returned 
-             */
         }
     }
 
@@ -99,7 +86,7 @@ namespace APIAutomation.Tests
         }
 
         [Test]
-        public void PostZipCodes_ReturnsAllAddedZipCodes()
+        public void PostZipCodes_ReturnsAllAddedZipCodes_Test()
         {
             // Generate unique zip codes for each request
             string[] sentZipCodes = GenerateUniqueZipCodes(6);
@@ -118,7 +105,7 @@ namespace APIAutomation.Tests
         }
         
         [Test]
-        public void PostZipCodes_SendDuplicatesForAvailableZipCodes()
+        public void PostZipCodes_SendDuplicatesForAvailableZipCodes_Test()
         {
             // Generate unique zip codes with duplicates for each request
             string[] sentZipCodes = GenerateUniqueDataWithDuplicatesForAvailableZipCodes(6);
@@ -140,7 +127,7 @@ namespace APIAutomation.Tests
             });
         }
 
-        /*Bug: The system displays dublicates in available zip codes in response when the request has dublicates in available zip codes
+        /*Bug: The system displays duplicates in available zip codes in response when the request has dublicates in available zip codes
          * 
          * Preconditions:
          * -the user is authorized
@@ -154,7 +141,7 @@ namespace APIAutomation.Tests
          */
 
         [Test]
-        public void PostZipCodes_SendDuplicatesForExistingZipCodes()
+        public void PostZipCodes_SendDuplicatesForExistingZipCodes_Test()
         {
             // Existing and new zip codes
             string[] existingZipCodes = new string[] { "12345", "23456", "ABCDE" };
@@ -192,4 +179,3 @@ namespace APIAutomation.Tests
          */
     }
 }
-

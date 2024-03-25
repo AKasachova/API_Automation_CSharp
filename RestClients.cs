@@ -14,7 +14,7 @@ namespace APIAutomation
         {
             var options = new RestClientOptions(baseURL)
             {
-                Authenticator = new BasicAuthenticator(baseURL, clientUsername, clientPassword, "write")
+                Authenticator = new BasicAuthenticator(baseURL, clientUsername, clientPassword, Scope.write)
             };
 
             _client = new RestClient(options);
@@ -52,7 +52,7 @@ namespace APIAutomation
         {
             var options = new RestClientOptions(baseURL)
             {
-                Authenticator = new BasicAuthenticator(baseURL, clientUsername, clientPassword, "read")
+                Authenticator = new BasicAuthenticator(baseURL, clientUsername, clientPassword, Scope.read)
             };
 
             _client = new RestClient(options);
@@ -77,16 +77,5 @@ namespace APIAutomation
         {
             return _client;
         }
-    }
-}
-
-//Use for Debugging. To delete after tests implementation
-public static class Test_For_Auth_Check
-{
-    [Test]
-    public static void Test1()
-    {
-        var client = ClientForWriteScope.GetInstance("http://localhost:50990", "0oa157tvtugfFXEhU4x7", "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq");
-        var restClient = client.GetRestClient();
     }
 }
