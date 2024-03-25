@@ -1,6 +1,4 @@
-﻿using APIAutomation;
-using NUnit.Framework;
-using RestSharp;
+﻿using RestSharp;
 using RestSharp.Authenticators;
 
 namespace APIAutomation

@@ -17,7 +17,7 @@ namespace APIAutomation.Tests
         {
             var client = ClientForReadScope.GetInstance("http://localhost:8000", "0oa157tvtugfFXEhU4x7", "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq");
             _client = client.GetRestClient();
-            _request = new RestRequest("/zip-codes", Method.Get);
+            _request = new RestRequest("/zip-codes");
         }
 
         [Test]
