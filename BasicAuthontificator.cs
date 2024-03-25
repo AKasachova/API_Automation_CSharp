@@ -1,18 +1,21 @@
-﻿using APIAutomation;
-using NUnit.Framework;
-using RestSharp;
+﻿using RestSharp;
 using RestSharp.Authenticators;
 
 namespace APIAutomation
 {
+    public enum Scope
+    {
+        read,
+        write
+    }
     public class BasicAuthenticator : AuthenticatorBase
     {
         readonly string _baseUrl;
         readonly string _clientUsername;
         readonly string _clientPassword;
-        readonly string _scope;
+        readonly Scope _scope;
 
-        public BasicAuthenticator(string baseUrl, string clientUsername, string clientPassword, string scope) : base("")
+        public BasicAuthenticator(string baseUrl, string clientUsername, string clientPassword, Scope scope) : base("")
         {
             _baseUrl = baseUrl;
             _clientUsername = clientUsername;

@@ -19,8 +19,8 @@ namespace APIAutomation.Tests
         {
             var clientForReadScope = ClientForReadScope.GetInstance("http://localhost:8000", "0oa157tvtugfFXEhU4x7", "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq");
             _clientForReadScope = clientForReadScope.GetRestClient();
-            _requestForReadScopeGetZipCodes = new RestRequest("/zip-codes", Method.Get);
-            _requestForReadScopeGetUsers = new RestRequest("/users", Method.Get);
+            _requestForReadScopeGetZipCodes = new RestRequest("/zip-codes");
+            _requestForReadScopeGetUsers = new RestRequest("/users");
 
             var clientForWriteScope = ClientForWriteScope.GetInstance("http://localhost:8000", "0oa157tvtugfFXEhU4x7", "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq");
             _clientForWriteScope = clientForWriteScope.GetRestClient();
@@ -28,7 +28,7 @@ namespace APIAutomation.Tests
         }
 
         [Test]
-        public void CheckUserWithAvailableZipCodeAddedAndThisZipCodeWasDeleted()
+        public void CheckUserWithAvailableZipCodeAddedAndThisZipCodeWasDeleted_Test()
         {
             //Get 1st Zip Code from available Zip Codes
             _clientForReadScope.AddDefaultHeader("Accept", "application/json");
@@ -70,7 +70,7 @@ namespace APIAutomation.Tests
         }
 
         [Test]
-        public void CheckUserWithOnlyRequiredDataWasAdded()
+        public void CheckUserWithOnlyRequiredDataWasAdded_Test()
         {
             var newUser = new
             {
@@ -93,7 +93,7 @@ namespace APIAutomation.Tests
         }
 
         [Test]
-        public void CheckUserWithUnavailableZipCodeWasNotAdded()
+        public void CheckUserWithUnavailableZipCodeWasNotAdded_Test()
         {
             //Get available Zip Codes
             _clientForReadScope.AddDefaultHeader("Accept", "application/json");
@@ -129,7 +129,7 @@ namespace APIAutomation.Tests
         }
 
         [Test]
-        public void CheckSentUserWithExistingNameAndSexWasNotAdded()
+        public void CheckSentUserWithExistingNameAndSexWasNotAdded_Test()
         {
             //Get existing users
             RestResponse getUsersResponse = _clientForReadScope.Execute(_requestForReadScopeGetUsers);

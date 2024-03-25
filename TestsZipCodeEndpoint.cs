@@ -99,7 +99,7 @@ namespace APIAutomation.Tests
         }
 
         [Test]
-        public void PostZipCodes_ReturnsAllAddedZipCodes()
+        public void PostZipCodes_ReturnsAllAddedZipCodes_Test()
         {
             // Generate unique zip codes for each request
             string[] sentZipCodes = GenerateUniqueZipCodes(6);
@@ -118,7 +118,7 @@ namespace APIAutomation.Tests
         }
         
         [Test]
-        public void PostZipCodes_SendDuplicatesForAvailableZipCodes()
+        public void PostZipCodes_SendDuplicatesForAvailableZipCodes_Test()
         {
             // Generate unique zip codes with duplicates for each request
             string[] sentZipCodes = GenerateUniqueDataWithDuplicatesForAvailableZipCodes(6);
@@ -154,7 +154,7 @@ namespace APIAutomation.Tests
          */
 
         [Test]
-        public void PostZipCodes_SendDuplicatesForExistingZipCodes()
+        public void PostZipCodes_SendDuplicatesForExistingZipCodes_Test()
         {
             // Existing and new zip codes
             string[] existingZipCodes = new string[] { "12345", "23456", "ABCDE" };
