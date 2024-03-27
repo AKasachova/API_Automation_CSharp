@@ -17,12 +17,12 @@ namespace APIAutomation.Tests
         [SetUp]
         public void Setup()
         {
-            var clientForReadScope = ClientForReadScope.GetInstance("http://localhost:8000", "0oa157tvtugfFXEhU4x7", "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq");
+            var clientForReadScope = ClientForReadScope.GetInstance();
             _clientForReadScope = clientForReadScope.GetRestClient();
             _requestForReadScopeGetZipCodes = new RestRequest("/zip-codes");
             _requestForReadScopeGetUsers = new RestRequest("/users");
 
-            var clientForWriteScope = ClientForWriteScope.GetInstance("http://localhost:8000", "0oa157tvtugfFXEhU4x7", "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq");
+            var clientForWriteScope = ClientForWriteScope.GetInstance();
             _clientForWriteScope = clientForWriteScope.GetRestClient();
             _requestForWriteScope = new RestRequest("/users ", Method.Post);
         }

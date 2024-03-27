@@ -1,4 +1,6 @@
-﻿using RestSharp;
+﻿using NUnit.Framework;
+using RestSharp;
+
 
 namespace APIAutomation
 {
@@ -18,7 +20,7 @@ namespace APIAutomation
             _client = new RestClient(options);
         }
 
-        public static ClientForWriteScope GetInstance(string baseURL, string clientUsername, string clientPassword)
+        public static ClientForWriteScope GetInstance()
         {
             if (_instance == null)
             {
@@ -26,6 +28,11 @@ namespace APIAutomation
                 {
                     if (_instance == null)
                     {
+                        // Retrieve parameters from configuration
+                        string baseURL = TestContext.Parameters["BaseUrl"];
+                        string clientUsername = TestContext.Parameters["ClientUsername"];
+                        string clientPassword = TestContext.Parameters["ClientPassword"];
+
                         _instance = new ClientForWriteScope(baseURL, clientUsername, clientPassword);
                     }
                 }
@@ -37,7 +44,6 @@ namespace APIAutomation
         {
             return _client;
         }
-
     }
 
     public class ClientForReadScope
@@ -56,7 +62,7 @@ namespace APIAutomation
             _client = new RestClient(options);
         }
 
-        public static ClientForReadScope GetInstance(string baseURL, string clientUsername, string clientPassword)
+        public static ClientForReadScope GetInstance()
         {
             if (_instance == null)
             {
@@ -64,6 +70,11 @@ namespace APIAutomation
                 {
                     if (_instance == null)
                     {
+                        // Retrieve parameters from configuration
+                        string baseURL = TestContext.Parameters["BaseUrl"];
+                        string clientUsername = TestContext.Parameters["ClientUsername"];
+                        string clientPassword = TestContext.Parameters["ClientPassword"];
+
                         _instance = new ClientForReadScope(baseURL, clientUsername, clientPassword);
                     }
                 }

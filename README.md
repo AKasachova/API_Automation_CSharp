@@ -22,7 +22,7 @@ To install the project, follow these steps:
 
 ## Usage
 
-To run tests it is needed to set up Client with appropriate parameters:
+To run tests it is needed to set up Client with appropriate parameters in Testsettings.runsettings file:
 1. Base URL: "http://localhost:<your port>"
 2. Username for authentication: "0oa157tvtugfFXEhU4x7"
 3. Password for authentication: "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq"
