@@ -19,13 +19,16 @@ To install the project, follow these steps:
 1. Clone the repository using Git: https://github.com/AKasachova/API_Automation_CSharp
 2. Open the project in Visual Studio.
 3. Build and run the project.
-
+ 
 ## Usage
 
 To run tests it is needed to set up Client with appropriate parameters in Testsettings.runsettings file:
 1. Base URL: "http://localhost:<your port>"
 2. Username for authentication: "0oa157tvtugfFXEhU4x7"
 3. Password for authentication: "X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq"
+
+To run UpdateUsers tests it is needed to set in TestSettings.runsettings file parameted "requestMethodParamForUpdateUsers" with value
+you want to execute as a Method (Patch/Put(set by default in the tests setup))
 
 ## Dependencies
 
