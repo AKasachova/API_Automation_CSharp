@@ -25,7 +25,7 @@ namespace APIAutomation.Tests
 
             var clientForWriteScope = ClientForWriteScope.GetInstance();
             _clientForWriteScope = clientForWriteScope.GetRestClient();
-            _requestForWriteScope = new RestRequest("/users/upload", Method.Post);
+            _requestForWriteScope = new RestRequest("/users/upload", Method.Put);
         }
 
         [Test]
