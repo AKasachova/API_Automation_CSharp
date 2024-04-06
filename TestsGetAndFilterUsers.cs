@@ -26,8 +26,11 @@ namespace APIAutomation.Tests
 
             var expectedUsers = new List<User>
             {
-                new User { Name = "Michael Davis", Age = 3, Sex = "MALE", ZipCode = "12345" },
-                new User { Name = "Olivia Johnson", Age = null, Sex = "FEMALE", ZipCode = null }
+                new User { Name = "Emma Jones", Age = 6, Sex = "MALE", ZipCode = "12345" },
+                new User { Name = "James Davis", Age = 73, Sex = "MALE", ZipCode = "23456" },
+                new User { Name = "James Brown", Age = 58, Sex = "MALE", ZipCode = "ABCDE" },
+                new User { Name = "David Smith", Age = 24, Sex = "MALE", ZipCode = null },
+                new User { Name = "Sophia Miller", Age = 59, Sex = "FEMALE", ZipCode = null }
             };
 
             List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(response.Content);
@@ -35,27 +38,15 @@ namespace APIAutomation.Tests
             Assert.Multiple(() =>
             {
                 Assert.That((int)response.StatusCode, Is.EqualTo(200));
-                Assert.That(expectedUsers.Count, Is.EqualTo(actualUsers.Count), "Number of users in response doesn't match expected count!");
-                Assert.That(actualUsers.Distinct().Count(), Is.EqualTo(expectedUsers.Count), "Response contains duplicates for users.");
-
-                foreach (var actualUser in actualUsers)
-                {
-                    bool userFound = expectedUsers.Any(expectedUser =>
-                        actualUser.Name == expectedUser.Name &&
-                        actualUser.Age == expectedUser.Age &&
-                        actualUser.Sex == expectedUser.Sex &&
-                        actualUser.ZipCode == expectedUser.ZipCode);
-
-                    Assert.That(userFound, Is.True, $"User Name:'{actualUser.Name}', Age: '{actualUser.Age}', Sex:'{actualUser.Sex}', Zip Code: '{actualUser.ZipCode}' " +
-                        $"  is not found in the expected users list.");
-                }
+                Assert.That(actualUsers, Is.EquivalentTo(expectedUsers), "Received users list doesn't correspond expected one!");
+            
             });
         }
 
         [Test]
         public void GetFilteredUsersOlderThan_ReturnsAllExpectedUsers_Test()
         {
-            int olderThan = 1;
+            int olderThan = 60;
             _request.AddParameter("olderThan", olderThan);
 
             _client.AddDefaultHeader("Accept", "application/json");
@@ -63,7 +54,7 @@ namespace APIAutomation.Tests
 
             var expectedUsers = new List<User>
             {
-            new User { Name = "Michael Davis", Age = 3, Sex = "MALE", ZipCode = "12345" }
+                new User { Name = "James Davis", Age = 73, Sex = "MALE", ZipCode = "23456" },
             };
 
             List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(response.Content);
@@ -71,20 +62,7 @@ namespace APIAutomation.Tests
             Assert.Multiple(() =>
             {
                 Assert.That((int)response.StatusCode, Is.EqualTo(200));
-                Assert.That(expectedUsers.Count, Is.EqualTo(actualUsers.Count), "Number of users in response doesn't match expected count!");
-                Assert.That(actualUsers.Distinct().Count(), Is.EqualTo(expectedUsers.Count), "Response contains duplicates for users.");
-
-                foreach (var actualUser in actualUsers)
-                {
-                    bool userFound = expectedUsers.Any(expectedUser =>
-                        actualUser.Name == expectedUser.Name &&
-                        actualUser.Age == expectedUser.Age &&
-                        actualUser.Sex == expectedUser.Sex &&
-                        actualUser.ZipCode == expectedUser.ZipCode);
-
-                    Assert.That(userFound, Is.True, $"User Name:'{actualUser.Name}', Age: '{actualUser.Age}', Sex:'{actualUser.Sex}', Zip Code: '{actualUser.ZipCode}' " +
-                        $"  is not found in the expected users list.");
-                }
+                Assert.That(actualUsers, Is.EquivalentTo(expectedUsers), "Received users list doesn't correspond expected one!");
             });
         }
 
@@ -104,20 +82,7 @@ namespace APIAutomation.Tests
             Assert.Multiple(() =>
             {
                 Assert.That((int)response.StatusCode, Is.EqualTo(200));
-                Assert.That(expectedUsers.Count, Is.EqualTo(actualUsers.Count), "Number of users in response doesn't match expected count!");
-                Assert.That(actualUsers.Distinct().Count(), Is.EqualTo(expectedUsers.Count), "Response contains duplicates for users.");
-
-                foreach (var actualUser in actualUsers)
-                {
-                    bool userFound = expectedUsers.Any(expectedUser =>
-                        actualUser.Name == expectedUser.Name &&
-                        actualUser.Age == expectedUser.Age &&
-                        actualUser.Sex == expectedUser.Sex &&
-                        actualUser.ZipCode == expectedUser.ZipCode);
-
-                    Assert.That(userFound, Is.True, $"User Name:'{actualUser.Name}', Age: '{actualUser.Age}', Sex:'{actualUser.Sex}', Zip Code: '{actualUser.ZipCode}' " +
-                        $"  is not found in the expected users list.");
-                }
+                Assert.That(actualUsers, Is.EquivalentTo(expectedUsers), "Received users list doesn't correspond expected one!");
             });
         }
 
@@ -132,7 +97,7 @@ namespace APIAutomation.Tests
 
             var expectedUsers = new List<User>
             {
-                new User { Name = "Olivia Johnson", Age = null, Sex = "FEMALE", ZipCode = null }
+                new User { Name = "Sophia Miller", Age = 59, Sex = "FEMALE", ZipCode = null }
             };
 
             List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(response.Content);
@@ -140,20 +105,7 @@ namespace APIAutomation.Tests
             Assert.Multiple(() =>
             {
                 Assert.That((int)response.StatusCode, Is.EqualTo(200));
-                Assert.That(expectedUsers.Count, Is.EqualTo(actualUsers.Count), "Number of users in response doesn't match expected count!");
-                Assert.That(actualUsers.Distinct().Count(), Is.EqualTo(expectedUsers.Count), "Response contains duplicates for users.");
-
-                foreach (var actualUser in actualUsers)
-                {
-                    bool userFound = expectedUsers.Any(expectedUser =>
-                        actualUser.Name == expectedUser.Name &&
-                        actualUser.Age == expectedUser.Age &&
-                        actualUser.Sex == expectedUser.Sex &&
-                        actualUser.ZipCode == expectedUser.ZipCode);
-
-                    Assert.That(userFound, Is.True, $"User Name:'{actualUser.Name}', Age: '{actualUser.Age}', Sex:'{actualUser.Sex}', Zip Code: '{actualUser.ZipCode}' " +
-                        $"  is not found in the expected users list.");
-                }
+                Assert.That(actualUsers, Is.EquivalentTo(expectedUsers), "Received users list doesn't correspond expected one!");
             });
         }
     }  
