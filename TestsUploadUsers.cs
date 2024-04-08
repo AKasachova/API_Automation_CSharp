@@ -45,7 +45,9 @@ namespace APIAutomation.Tests
              };
             var usersCountFile = users.Count;
 
-            string jsonFilePath = "C:\\Users\\kosac_xmbzi23\\OneDrive\\Рабочий стол\\API_Automation_CSharp\\API_C_sharp\\Test_data\\Users.json";
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string jsonFilePath = Path.Combine(Directory.GetParent(currentDirectory).Parent.Parent.FullName, "Test_data", "Users.json");
+
             var usersJson = JsonConvert.SerializeObject(users, new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
@@ -92,7 +94,9 @@ namespace APIAutomation.Tests
                  new User{Age = RandomUserGenerator.GenerateRandomAge(), Name = RandomUserGenerator.GenerateRandomName(), Sex = RandomUserGenerator.GenerateRandomSex(), ZipCode = unavailableZipCode}
              };
 
-            string jsonFilePath = "C:\\Users\\kosac_xmbzi23\\OneDrive\\Рабочий стол\\API_Automation_CSharp\\API_C_sharp\\Test_data\\Users.json";
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string jsonFilePath = Path.Combine(Directory.GetParent(currentDirectory).Parent.Parent.FullName, "Test_data", "Users.json");
+
             var usersJson = JsonConvert.SerializeObject(users, new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
@@ -155,7 +159,9 @@ namespace APIAutomation.Tests
                         new User{Age = RandomUserGenerator.GenerateRandomAge(), Sex = RandomUserGenerator.GenerateRandomSex(), ZipCode = availableZipCodes[1]}
                     };
 
-            string jsonFilePath = "C:\\Users\\kosac_xmbzi23\\OneDrive\\Рабочий стол\\API_Automation_CSharp\\API_C_sharp\\Test_data\\Users.json";
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string jsonFilePath = Path.Combine(Directory.GetParent(currentDirectory).Parent.Parent.FullName, "Test_data", "Users.json");
+
             var usersJson = JsonConvert.SerializeObject(users, new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
