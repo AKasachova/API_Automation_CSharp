@@ -13,7 +13,7 @@ docker pull coherentsolutions/rest-training:1.0
 docker run -d -p <your port>:8082 coherentsolutions/rest-training:1.0 
 After that open swagger documentation in browser: http://localhost:<your port>/swagger-ui/ 
 
-## Installation
+## Installation17
 
 To install the project, follow these steps:
 1. Clone the repository using Git: https://github.com/AKasachova/API_Automation_CSharp
