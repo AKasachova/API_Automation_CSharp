@@ -2,10 +2,15 @@
 using NUnit.Framework;
 using RestSharp;
 using NLog;
+using NUnit.Allure.Core;
+using NUnit.Allure.Attributes;
+using Allure.Commons;
 
 namespace APIAutomation.Tests
 {
     [TestFixture]
+    [AllureNUnit]
+    [AllureSuite("Update Users")]
     public class UpdateUsersTests
     {
         private RestClient _clientForReadScope;
@@ -39,22 +44,31 @@ namespace APIAutomation.Tests
         }
 
         [Test]
+        [AllureDescription("Test to update user with all new values")]
         public void UpdateAnyUserWithAllValidData_CheckTheUserWasUpdated_Test()
         {
             logger.Info("Starting UpdateAnyUserWithAllValidData_CheckTheUserWasUpdated_Test");
 
             try
             {
+                StepResult step1 = new StepResult { name = "Step#1: Get all users, count them and select the first one" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 _clientForReadScope.AddDefaultHeader("Accept", "application/json");
                 RestResponse getAllUsers = _clientForReadScope.Execute(_requestForReadUsers);
                 List<User> allUsers = JsonConvert.DeserializeObject<List<User>>(getAllUsers.Content);
                 int initialCountUsers = allUsers.Count;
                 User selectedUser = allUsers[0];
+                AllureLifecycle.Instance.StopStep();
 
+                StepResult step2 = new StepResult { name = "Step#2: Get available zip codes and select the first one" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
                 RestResponse getZipCodesResponse = _clientForReadScope.Execute(_requestForReadZipCodes);
                 List<string> availableZipCodes = JsonConvert.DeserializeObject<List<string>>(getZipCodesResponse.Content);
                 string availableZipCode = availableZipCodes[0];
+                AllureLifecycle.Instance.StopStep();
 
+                StepResult step3 = new StepResult { name = "Step#3: Update selected user with new one(contains all new correct data) and receive the response" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step3);
                 var updateUser = new
                 {
                     userNewValues = new
@@ -74,9 +88,16 @@ namespace APIAutomation.Tests
                     }
                 };
                 _requestForWriteScope.AddJsonBody(updateUser);
-                RestResponse updateResponse = _clientForWriteScope.Execute(_requestForWriteScope);
 
-                // check if user is updated
+                string tempFilePath = Path.GetTempFileName();
+                File.WriteAllText(tempFilePath, JsonConvert.SerializeObject(updateUser));
+                AllureLifecycle.Instance.AddAttachment("Request Payload", "application/json", tempFilePath);
+
+                RestResponse updateResponse = _clientForWriteScope.Execute(_requestForWriteScope);
+                AllureLifecycle.Instance.StopStep();
+
+                StepResult step4 = new StepResult { name = "Step#4: Verify Status Code of the response and selected user was updated with the new data" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step4);
                 RestResponse getUsersResponse = _clientForReadScope.Execute(_requestForReadUsers);
                 List<User> updatedUsers = JsonConvert.DeserializeObject<List<User>>(getUsersResponse.Content);
                 bool updatedUserFound = updatedUsers.Any(u => u.Age == updateUser.userNewValues.age && u.Name == updateUser.userNewValues.name && u.Sex == updateUser.userNewValues.sex && u.ZipCode == updateUser.userNewValues.zipCode);
@@ -91,6 +112,7 @@ namespace APIAutomation.Tests
                     Assert.That(finalCountUsers == initialCountUsers, Is.True, "Unexpected number of users after update:" + finalCountUsers + ", expected number:" + initialCountUsers);
                 });
                 logger.Info("UpdateAnyUserWithAllValidData_CheckTheUserWasUpdated_Test completed successfully.");
+                AllureLifecycle.Instance.StopStep();
             }
             catch (Exception ex)
             {
@@ -99,18 +121,25 @@ namespace APIAutomation.Tests
         }
 
         [Test]
+        [AllureDescription("Test to update user with all new values and unavailable zip code")]
+        [AllureIssue("BUG: The user needed not to be updated is deleted.")] 
         public void UpdateUserWithUnavailableZipCode_CheckTheUserWasNotUpdated_Test()
         {
             logger.Info("Starting UpdateUserWithUnavailableZipCode_CheckTheUserWasNotUpdated_Test");
 
             try
             {
+                StepResult step1 = new StepResult { name = "Step#1: Get all users, count them and select the first one" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 _clientForReadScope.AddDefaultHeader("Accept", "application/json");
                 RestResponse getAllUsers = _clientForReadScope.Execute(_requestForReadUsers);
                 List<User> allUsers = JsonConvert.DeserializeObject<List<User>>(getAllUsers.Content);
                 int initialCountUsers = allUsers.Count;
                 User selectedUser = allUsers[0];
+                AllureLifecycle.Instance.StopStep();
 
+                StepResult step2 = new StepResult { name = "Step#2: Get available zip codes and create unavailable" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
                 RestResponse getZipCodesResponse = _clientForReadScope.Execute(_requestForReadZipCodes);
                 List<string> availableZipCodes = JsonConvert.DeserializeObject<List<string>>(getZipCodesResponse.Content);
                 string unavailableZipCode;
@@ -119,7 +148,10 @@ namespace APIAutomation.Tests
                     unavailableZipCode = RandomUserGenerator.GenerateRandomZipCode();
                 }
                 while (availableZipCodes.Contains(unavailableZipCode));
+                AllureLifecycle.Instance.StopStep();
 
+                StepResult step3 = new StepResult { name = "Step#3: Update selected user with new one(contains unavailable zip code) and receive the response" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step3);
                 var updateUser = new
                 {
                     userNewValues = new
@@ -139,9 +171,16 @@ namespace APIAutomation.Tests
                     }
                 };
                 _requestForWriteScope.AddJsonBody(updateUser);
-                RestResponse updateResponse = _clientForWriteScope.Execute(_requestForWriteScope);
 
-                // check if user is not updated
+                string tempFilePath = Path.GetTempFileName();
+                File.WriteAllText(tempFilePath, JsonConvert.SerializeObject(updateUser));
+                AllureLifecycle.Instance.AddAttachment("Request Payload", "application/json", tempFilePath);
+
+                RestResponse updateResponse = _clientForWriteScope.Execute(_requestForWriteScope);
+                AllureLifecycle.Instance.StopStep();
+
+                StepResult step4 = new StepResult { name = "Step#4: Verify Status Code of the response and selected user was not updated with the new data" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step4);
                 RestResponse getUsersResponse = _clientForReadScope.Execute(_requestForReadUsers);
                 List<User> updatedUsers = JsonConvert.DeserializeObject<List<User>>(getUsersResponse.Content);
                 bool updatedUserFound = updatedUsers.Any(u => u.Age == updateUser.userNewValues.age && u.Name == updateUser.userNewValues.name && u.Sex == updateUser.userNewValues.sex && u.ZipCode == updateUser.userNewValues.zipCode);
@@ -157,6 +196,7 @@ namespace APIAutomation.Tests
                     Assert.That(finalCountUsers == initialCountUsers, Is.True, "Unexpected number of users after update:" + finalCountUsers + ", expected number:" + initialCountUsers);
                 });
                 logger.Info("UpdateUserWithUnavailableZipCode_CheckTheUserWasNotUpdated_Test completed successfully.");
+                AllureLifecycle.Instance.StopStep();
             }
             catch (Exception ex)
             {
@@ -178,22 +218,32 @@ namespace APIAutomation.Tests
          */
 
         [Test]
+        [AllureDescription("Test to update user with all new values and missed required fields")]
+        [AllureIssue("BUG: The user needed not to be updated is deleted.")]
         public void UpdateAnyUserWithoutRequiredFields_CheckTheUserWasNotUpdated_Test()
         {
             logger.Info("Starting UpdateAnyUserWithoutRequiredFields_CheckTheUserWasNotUpdated_Test");
 
             try
             {
+                StepResult step1 = new StepResult { name = "Step#1: Get all users, count them and select the first one" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 _clientForReadScope.AddDefaultHeader("Accept", "application/json");
                 RestResponse getAllUsers = _clientForReadScope.Execute(_requestForReadUsers);
                 List<User> allUsers = JsonConvert.DeserializeObject<List<User>>(getAllUsers.Content);
                 int initialCountUsers = allUsers.Count;
                 User selectedUser = allUsers[0];
+                AllureLifecycle.Instance.StopStep();
 
+                StepResult step2 = new StepResult { name = "Step#2: Get available zip codes" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
                 RestResponse getZipCodesResponse = _clientForReadScope.Execute(_requestForReadZipCodes);
                 List<string> availableZipCodes = JsonConvert.DeserializeObject<List<string>>(getZipCodesResponse.Content);
                 string availableZipCode = availableZipCodes[0];
+                AllureLifecycle.Instance.StopStep();
 
+                StepResult step3 = new StepResult { name = "Step#3: Update selected user with new one(doesn't contain required fields) and receive the response" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step3);
                 var updateUser = new
                 {
                     userNewValues = new
@@ -211,9 +261,16 @@ namespace APIAutomation.Tests
                     }
                 };
                 _requestForWriteScope.AddJsonBody(updateUser);
-                RestResponse updateResponse = _clientForWriteScope.Execute(_requestForWriteScope);
 
-                // check if user is not updated
+                string tempFilePath = Path.GetTempFileName();
+                File.WriteAllText(tempFilePath, JsonConvert.SerializeObject(updateUser));
+                AllureLifecycle.Instance.AddAttachment("Request Payload", "application/json", tempFilePath);
+
+                RestResponse updateResponse = _clientForWriteScope.Execute(_requestForWriteScope);
+                AllureLifecycle.Instance.StopStep();
+
+                StepResult step4 = new StepResult { name = "Step#4: Verify Status Code of the response and selected user was not updated with the new data" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step4);
                 RestResponse getUsersResponse = _clientForReadScope.Execute(_requestForReadUsers);
                 List<User> updatedUsers = JsonConvert.DeserializeObject<List<User>>(getUsersResponse.Content);
                 bool updatedUserFound = updatedUsers.Any(u => u.Age == updateUser.userNewValues.age && u.Name == selectedUser.Name && u.Sex == selectedUser.Sex && u.ZipCode == updateUser.userNewValues.zipCode);
@@ -229,6 +286,7 @@ namespace APIAutomation.Tests
                     Assert.That(finalCountUsers == initialCountUsers, Is.True, "Unexpected number of users after update:" + finalCountUsers + ", expected number:" + initialCountUsers);
                 });
                 logger.Info("UpdateAnyUserWithoutRequiredFields_CheckTheUserWasNotUpdated_Test completed successfully.");
+                AllureLifecycle.Instance.StopStep();
             }
             catch (Exception ex)
             {
@@ -248,5 +306,11 @@ namespace APIAutomation.Tests
          * Expected result: the user is not updated
          * Actual result: the user is deleted 
          */
+        [TearDown]
+        public void TearDown()
+        {
+            logger.Info("Tearing down tests...");
+            LogManager.Shutdown();
+        }
     }
 }

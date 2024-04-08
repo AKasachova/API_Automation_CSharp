@@ -2,10 +2,15 @@
 using NUnit.Framework;
 using RestSharp;
 using NLog;
+using NUnit.Allure.Core;
+using NUnit.Allure.Attributes;
+using Allure.Commons;
 
 namespace APIAutomation.Tests
 {
     [TestFixture]
+    [AllureNUnit]
+    [AllureSuite("Create Users")]
     public class UserCreationTests
     {
         private RestClient _clientForReadScope;
@@ -33,19 +38,24 @@ namespace APIAutomation.Tests
         }
 
         [Test]
+        [AllureDescription("Test to add user with all filled fields")]
         public void CheckUserWithAvailableZipCodeAddedAndThisZipCodeWasDeleted_Test()
         {
             logger.Info("Starting CheckUserWithAvailableZipCodeAddedAndThisZipCodeWasDeleted_Test");
 
             try
             {
-                //Get 1st Zip Code from available Zip Codes
+                StepResult step1 = new StepResult { name = "Step#1: Get all available zip codes and select the first one." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 _clientForReadScope.AddDefaultHeader("Accept", "application/json");
                 RestResponse getZipCodesResponse = _clientForReadScope.Execute(_requestForReadScopeGetZipCodes);
                 List<string> availableZipCodes = JsonConvert.DeserializeObject<List<string>>(getZipCodesResponse.Content);
                 int initialCount = availableZipCodes.Count;
                 string selectedZipCode = availableZipCodes.FirstOrDefault();
+                AllureLifecycle.Instance.StopStep();
 
+                StepResult step2 = new StepResult { name = "Step#2: Send created user with available zip code and receive respond." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
                 var newUser = new
                 {
                     age = RandomUserGenerator.GenerateRandomAge(),
@@ -55,8 +65,16 @@ namespace APIAutomation.Tests
                 };
 
                 _requestForWriteScope.AddJsonBody(newUser);
-                RestResponse postResponse = _clientForWriteScope.Execute(_requestForWriteScope);          
 
+                string tempFilePath = Path.GetTempFileName();
+                File.WriteAllText(tempFilePath, JsonConvert.SerializeObject(newUser));
+                AllureLifecycle.Instance.AddAttachment("Request Payload", "application/json", tempFilePath);
+
+                RestResponse postResponse = _clientForWriteScope.Execute(_requestForWriteScope);
+                AllureLifecycle.Instance.StopStep();
+
+                StepResult step3 = new StepResult { name = "Step#3: Verify Status Code of the response and user is added to application and chosen zip code is removed from available zip codes." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step3);
                 Assert.That((int)postResponse.StatusCode, Is.EqualTo(201), "Expected status code 201 (Created) but received " + (int)postResponse.StatusCode);
 
                 // GET request to /users endpoint to check if user is added
@@ -78,6 +96,7 @@ namespace APIAutomation.Tests
                 $"Initial Count: {initialCount}, Final Count: {finalCount}");
 
                 logger.Info("CheckUserWithAvailableZipCodeAddedAndThisZipCodeWasDeleted_Test completed successfully.");
+                AllureLifecycle.Instance.StopStep();
             }
             catch (Exception ex)
             {
@@ -86,12 +105,15 @@ namespace APIAutomation.Tests
         }
 
         [Test]
+        [AllureDescription("Test to add user with only required fields filled")]
         public void CheckUserWithOnlyRequiredDataWasAdded_Test()
         {
             logger.Info("Starting CheckUserWithOnlyRequiredDataWasAdded_Test");
 
             try
             {
+                StepResult step1 = new StepResult { name = "Step#1: Send user with only required fields filled and receive respond." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 var newUser = new
                 {
                     name = RandomUserGenerator.GenerateRandomName(),
@@ -99,9 +121,17 @@ namespace APIAutomation.Tests
                 };
 
                 _requestForWriteScope.AddJsonBody(newUser);
+
+                string tempFilePath = Path.GetTempFileName();
+                File.WriteAllText(tempFilePath, JsonConvert.SerializeObject(newUser));
+                AllureLifecycle.Instance.AddAttachment("Request Payload", "application/json", tempFilePath);
+
                 _clientForWriteScope.AddDefaultHeader("Accept", "application/json");
                 RestResponse postResponse = _clientForWriteScope.Execute(_requestForWriteScope);
+                AllureLifecycle.Instance.StopStep();
 
+                StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the response and user is added to application." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
                 Assert.That((int)postResponse.StatusCode, Is.EqualTo(201), "Expected status code 201 (Created) but received " + (int)postResponse.StatusCode);
 
                 // GET request to /users endpoint to check if user is added
@@ -112,6 +142,7 @@ namespace APIAutomation.Tests
                 Assert.That(userFound, Is.True, "Added user not found in user list.");
 
                 logger.Info("CheckUserWithOnlyRequiredDataWasAdded_Test completed successfully.");
+                AllureLifecycle.Instance.StopStep();
             }
             catch (Exception ex)
             {
@@ -120,13 +151,15 @@ namespace APIAutomation.Tests
         }
 
         [Test]
+        [AllureDescription("Test to add user with unavailable zip code.")]
         public void CheckUserWithUnavailableZipCodeWasNotAdded_Test()
         {
-            logger.Info("Starting CheckUserWithUnavailableZipCodeWasNotAdded_Test");
+            logger.Info("Starting CheckUserWithUnavailableZipCodeWasNotAdded_Test.");
 
             try
             {
-                //Get available Zip Codes
+                StepResult step1 = new StepResult { name = "Step#1: Get all available zip codes and create unavailable." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 _clientForReadScope.AddDefaultHeader("Accept", "application/json");
                 RestResponse getZipCodesResponse = _clientForReadScope.Execute(_requestForReadScopeGetZipCodes);
                 List<string> availableZipCodes = JsonConvert.DeserializeObject<List<string>>(getZipCodesResponse.Content);
@@ -137,7 +170,10 @@ namespace APIAutomation.Tests
                     unavailableZipCode = RandomUserGenerator.GenerateRandomZipCode(); 
                 }
                 while (availableZipCodes.Contains(unavailableZipCode));
+                AllureLifecycle.Instance.StopStep();
 
+                StepResult step2 = new StepResult { name = "Step#2: Send created user with unavailable zip code and receive respond." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
                 var newUser = new
                 {
                     age = RandomUserGenerator.GenerateRandomAge(),
@@ -147,8 +183,16 @@ namespace APIAutomation.Tests
                 };
 
                 _requestForWriteScope.AddJsonBody(newUser);
-                RestResponse postResponse = _clientForWriteScope.Execute(_requestForWriteScope);
 
+                string tempFilePath = Path.GetTempFileName();
+                File.WriteAllText(tempFilePath, JsonConvert.SerializeObject(newUser));
+                AllureLifecycle.Instance.AddAttachment("Request Payload", "application/json", tempFilePath);
+
+                RestResponse postResponse = _clientForWriteScope.Execute(_requestForWriteScope);
+                AllureLifecycle.Instance.StopStep();
+
+                StepResult step3 = new StepResult { name = "Step#3: Verify Status Code of the response and user is not added to application." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step3);
                 Assert.That((int)postResponse.StatusCode, Is.EqualTo(424), "Expected status code 424 but received " + (int)postResponse.StatusCode);
 
                 // GET request to /users endpoint to check if user is not added
@@ -159,6 +203,7 @@ namespace APIAutomation.Tests
                 Assert.That(userFound, Is.False, "User is found in user list.");
 
                 logger.Info("CheckUserWithUnavailableZipCodeWasNotAdded_Test completed successfully.");
+                AllureLifecycle.Instance.StopStep();
             }
             catch (Exception ex)
             {
@@ -167,13 +212,16 @@ namespace APIAutomation.Tests
         }
 
         [Test]
+        [AllureDescription("Test to add user with the same name and sex as existing user in the system.")]
+        [AllureIssue("BUG: The system displays 201 code after posting user's data with the same Name and Sex as for existing user.")]
         public void CheckSentUserWithExistingNameAndSexWasNotAdded_Test()
         {
             logger.Info("Starting CheckUserWithUnavailableZipCodeWasNotAdded_Test");
 
             try
             {
-                //Get existing users
+                StepResult step1 = new StepResult { name = "Step#1: Get existing user and create a new one using it's name and sex." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 RestResponse getUsersResponse = _clientForReadScope.Execute(_requestForReadScopeGetUsers);
                 List<User> userList = JsonConvert.DeserializeObject<List<User>>(getUsersResponse.Content);
                 var initialUserCount = userList.Count;
@@ -184,10 +232,21 @@ namespace APIAutomation.Tests
                     name = userFound.Name,
                     sex = userFound.Sex,
                 };
+                AllureLifecycle.Instance.StopStep();
 
+                StepResult step2 = new StepResult { name = "Step#2: Send created user  and receive respond." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
                 _requestForWriteScope.AddJsonBody(newUser);
-                RestResponse postResponse = _clientForWriteScope.Execute(_requestForWriteScope);
 
+                string tempFilePath = Path.GetTempFileName();
+                File.WriteAllText(tempFilePath, JsonConvert.SerializeObject(newUser));
+                AllureLifecycle.Instance.AddAttachment("Request Payload", "application/json", tempFilePath);
+
+                RestResponse postResponse = _clientForWriteScope.Execute(_requestForWriteScope);
+                AllureLifecycle.Instance.StopStep();
+
+                StepResult step3 = new StepResult { name = "Step#3: Verify Status Code of the response and user is not added to application." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step3);
                 //Test fail: status code equals 201(400 is expected)
                 Assert.That((int)postResponse.StatusCode, Is.EqualTo(400), "Expected status code 400 but received " + (int)postResponse.StatusCode);
 
@@ -199,6 +258,7 @@ namespace APIAutomation.Tests
                 Assert.That(initialUserCount == finalUserCount, Is.True, "Number of users should remain the same.");
 
                 logger.Info("CheckUserWithUnavailableZipCodeWasNotAdded_Test completed successfully.");
+                AllureLifecycle.Instance.StopStep();
             }
             catch (Exception ex)
             {
