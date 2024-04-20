@@ -21,8 +21,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Restore NuGet packages
-        run: dotnet restore C:\Users\kosac_xmbzi23\OneDrive\Рабочий стол\API_Automation_CSharp\API_C_sharp\APIAutomation.csproj
+      - name: Restore NuGet packages for XSLT processing
+        uses: IT-Service/restore-nuget-packages@v1
+        with:
+          packages-config-path: tools/xslt/packages.config
+          packages-directory-path: tools/xslt/packages
 
       - name: Build framework
         run: dotnet build --configuration Release
