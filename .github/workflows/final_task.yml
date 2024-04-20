@@ -1,10 +1,12 @@
 name: API Testing Pipeline
 
 on:
-  push:
-    branches:
-      -Final_Task
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Final_Task'
+        required: true
+        default: 'Final_Task' 
 
 jobs:
   deploy_and_test:
