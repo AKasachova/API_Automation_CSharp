@@ -21,9 +21,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Navigate to project directory
+        run: cd C:\Users\kosac_xmbzi23\OneDrive\Рабочий стол\API_Automation_CSharp\API_C_sharp
+      
       - name: Restore NuGet packages
-        run: |
-          cd C:\Users\kosac_xmbzi23\OneDrive\Рабочий стол\API_Automation_CSharp\API_C_sharp dotnet restore
+        run: dotnet restore
 
       - name: Build framework
         run: dotnet build --configuration Release
