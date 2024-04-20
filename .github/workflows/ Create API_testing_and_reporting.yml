@@ -3,7 +3,7 @@ name: API Testing Pipeline
 on:
   push:
     branches:
-      - main
+      -Final_Task
   workflow_dispatch:
 
 jobs:
