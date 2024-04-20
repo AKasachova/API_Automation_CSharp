@@ -22,7 +22,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Restore NuGet packages
-        run: dotnet restore
+        run: |
+          cd C:\Users\kosac_xmbzi23\OneDrive\Рабочий стол\API_Automation_CSharp\API_C_sharp dotnet restore
 
       - name: Build framework
         run: dotnet build --configuration Release
