@@ -13,15 +13,15 @@ jobs:
       - name: Deploy API image
         run: |
           docker pull coherentsolutions/rest-training:2.0
-          docker run -d -p 8082:8082 coherentsolutions/rest-training:2.0
+          docker run -d -p 8001:8082 coherentsolutions/rest-training:2.0
 
       - name: Install .NET SDK
-        uses: xt0rted/setup-dotnet@v1.0.0
+        uses: actions/setup-dotnet@v2.0.0
         with:
           dotnet-version: 8.0.4
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Restore NuGet packages
         run: dotnet restore
