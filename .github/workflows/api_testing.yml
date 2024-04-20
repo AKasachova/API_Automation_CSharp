@@ -21,11 +21,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Restore NuGet packages for XSLT processing
+      - name: Restore NuGet packages 
         uses: IT-Service/restore-nuget-packages@v1
         with:
-          packages-config-path: tools/xslt/packages.config
-          packages-directory-path: tools/xslt/packages
+          packages-config-path: C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
+          packages-directory-path: C:\Program Files (x86)\NuGet\Config
 
       - name: Build framework
         run: dotnet build --configuration Release
