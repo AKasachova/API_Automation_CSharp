@@ -27,8 +27,8 @@ jobs:
       - name: Restore NuGet packages 
         uses: IT-Service/restore-nuget-packages@v1
         with:
-          packages-config-path: C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
-          packages-directory-path: C:\Program Files (x86)\NuGet\Config
+          packages-config-path: C:\Program Files(x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
+          packages-directory-path: C:\Program Files(x86)\NuGet\Config
 
       - name: Build framework
         run: dotnet build --configuration Release
