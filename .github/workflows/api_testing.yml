@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: test
-        run: chmod +x C:\Program Files (x86)\NuGet\nuget.exe
+        run: chmod +x C:\Program Files(x86)\NuGet\nuget.exe
 
       - name: Restore NuGet packages 
         uses: IT-Service/restore-nuget-packages@v1
