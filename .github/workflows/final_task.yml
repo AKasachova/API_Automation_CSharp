@@ -26,10 +26,10 @@ jobs:
         run: dotnet restore APIAutomation.csproj  
 
       - name: Build framework
-        run: dotnet build --configuration Release --settings TestSettings.runsettings
+        run: dotnet build --configuration Release 
 
       - name: Execute tests
-        run: dotnet test --configuration Release
+        run: dotnet test --configuration Release --settings TestSettings.runsettings
 
       - name: Load test report history
         uses: actions/checkout@v4
