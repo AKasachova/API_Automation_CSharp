@@ -1,12 +1,6 @@
-﻿using System.Text.Json.Serialization;
-
-namespace APIAutomation
+﻿public class TokenResponse
 {
-    record TokenResponse
-    {
-        [JsonPropertyName("token_type")]
-        public string TokenType { get; init; }
-        [JsonPropertyName("access_token")]
-        public string AccessToken { get; init; }
-    }
+    public string TokenType { get; set; }
+    public string AccessToken { get; set; }
+
 }

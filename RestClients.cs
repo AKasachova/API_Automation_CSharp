@@ -1,6 +1,5 @@
-﻿using NUnit.Framework;
-using RestSharp;
-
+﻿using System.Net.Http.Headers;
+using NUnit.Framework;
 
 namespace APIAutomation
 {
@@ -8,16 +7,16 @@ namespace APIAutomation
     {
         private static ClientForWriteScope _instance;
         private static readonly object _lock = new object();
-        private readonly RestClient _client;
+        private readonly HttpClient _client;
 
         private ClientForWriteScope(string baseURL, string clientUsername, string clientPassword)
         {
-            var options = new RestClientOptions(baseURL)
-            {
-                Authenticator = new BasicAuthenticator(baseURL, clientUsername, clientPassword, Scope.write)
-            };
-
-            _client = new RestClient(options);
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri(baseURL);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Basic",
+                Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{clientUsername}:{clientPassword}"))
+            );
         }
 
         public static ClientForWriteScope GetInstance()
@@ -40,7 +39,7 @@ namespace APIAutomation
             return _instance;
         }
 
-        public RestClient GetRestClient()
+        public HttpClient GetHttpClient()
         {
             return _client;
         }
@@ -50,16 +49,16 @@ namespace APIAutomation
     {
         private static ClientForReadScope _instance;
         private static readonly object _lock = new object();
-        private readonly RestClient _client;
+        private readonly HttpClient _client;
 
         private ClientForReadScope(string baseURL, string clientUsername, string clientPassword)
         {
-            var options = new RestClientOptions(baseURL)
-            {
-                Authenticator = new BasicAuthenticator(baseURL, clientUsername, clientPassword, Scope.read)
-            };
-
-            _client = new RestClient(options);
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri(baseURL);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Basic",
+                Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{clientUsername}:{clientPassword}"))
+            );
         }
 
         public static ClientForReadScope GetInstance()
@@ -82,7 +81,7 @@ namespace APIAutomation
             return _instance;
         }
 
-        public RestClient GetRestClient()
+        public HttpClient GetHttpClient()
         {
             return _client;
         }

@@ -1,6 +1,9 @@
-﻿using Newtonsoft.Json;
-using NUnit.Framework;
-using RestSharp;
+﻿using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 using NLog;
 using NUnit.Allure.Core;
 using NUnit.Allure.Attributes;
@@ -13,8 +16,8 @@ namespace APIAutomation.Tests
     [AllureSuite("Filter Users")]
     public class GetAndFilterUsersTests
     {
-        private RestClient _client;
-        private RestRequest _request;
+        private HttpClient _client;
+        private string _baseUrl = "/users"; 
 
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -23,24 +26,24 @@ namespace APIAutomation.Tests
         {
             "GetAndFilterUsersTests".LogInfo("Setting up tests...");
 
-            var client = ClientForReadScope.GetInstance();
-            _client = client.GetRestClient();
-            _request = new RestRequest("/users");
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri(_baseUrl);
         }
 
         [Test]
         [AllureDescription("Test to get all expected users stored in the application for now")]
-        public void GetAllUsers_ReturnsAllExpectedUsers_Test()
+        public async Task GetAllUsers_ReturnsAllExpectedUsers_Test()
         {
             "GetAllUsers_ReturnsAllExpectedUsers_Test".LogInfo("Starting the test...");
 
-            try 
+            try
             {
                 StepResult step1 = new StepResult { name = "Step#1: Get all users stored currently" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
-                _client.AddDefaultHeader("Accept", "application/json");
-                RestResponse response = _client.Execute(_request);
-                List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(response.Content);
+                HttpResponseMessage response = await _client.GetAsync("_baseUrl");
+                response.EnsureSuccessStatusCode();
+                string responseContent = await response.Content.ReadAsStringAsync();
+                List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(responseContent);
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the GET response and all recieved users correspond to all expected to receive" };
@@ -58,7 +61,7 @@ namespace APIAutomation.Tests
                 {
                     Assert.That((int)response.StatusCode, Is.EqualTo(200));
                     Assert.That(actualUsers, Is.EquivalentTo(expectedUsers), "Received users list doesn't correspond expected one!");
-            
+
                 });
 
                 "GetAllUsers_ReturnsAllExpectedUsers_Test".LogInfo("The test completed successfully.");
@@ -72,7 +75,7 @@ namespace APIAutomation.Tests
 
         [Test]
         [AllureDescription("Test to get all users older than set parameter")]
-        public void GetFilteredUsersOlderThan_ReturnsAllExpectedUsers_Test()
+        public async Task GetFilteredUsersOlderThan_ReturnsAllExpectedUsers_Test()
         {
             "GetFilteredUsersOlderThan_ReturnsAllExpectedUsers_Test".LogInfo("Starting the test...");
 
@@ -81,38 +84,40 @@ namespace APIAutomation.Tests
                 StepResult step1 = new StepResult { name = "Step#1: Get all users older than set parameter" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 int olderThan = 60;
-                _request.AddParameter("olderThan", olderThan);
 
-                _client.AddDefaultHeader("Accept", "application/json");
-                RestResponse response = _client.Execute(_request);
+                HttpResponseMessage response = await _client.GetAsync($"{_baseUrl}?olderThan={olderThan}");
+                response.EnsureSuccessStatusCode();
+
+                string responseContent = await response.Content.ReadAsStringAsync();
+                List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(responseContent);
                 AllureLifecycle.Instance.StopStep();
 
-                StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the GET response and all recieved filtered (older than) users correspond to all expected to receive" };
+                StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the GET response and all received filtered (older than) users correspond to all expected to receive" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
                 var expectedUsers = new List<User>
                 {
                     new User { Name = "James Davis", Age = 73, Sex = "MALE", ZipCode = "23456" },
                 };
 
-                List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(response.Content);
-
                 Assert.Multiple(() =>
                 {
                     Assert.That((int)response.StatusCode, Is.EqualTo(200));
                     Assert.That(actualUsers, Is.EquivalentTo(expectedUsers), "Received users list doesn't correspond expected one!");
                 });
+
                 "GetFilteredUsersOlderThan_ReturnsAllExpectedUsers_Test".LogInfo("The test completed successfully.");
                 AllureLifecycle.Instance.StopStep();
             }
             catch (Exception ex)
             {
-                "GetFilteredUsersOlderThan_ReturnsAllExpectedUsers_Test".LogError($"Error occured: {ex.Message}");
+                "GetFilteredUsersOlderThan_ReturnsAllExpectedUsers_Test".LogError($"Error occurred: {ex.Message}");
             }
         }
 
+
         [Test]
-        [AllureDescription("Test to get all users yanger than set parameter")]
-        public void GetFilteredUsersYoungerThan_ReturnsAllExpectedUsers_Test()
+        [AllureDescription("Test to get all users younger than set parameter")]
+        public async Task GetFilteredUsersYoungerThan_ReturnsAllExpectedUsers_Test()
         {
             "GetFilteredUsersYoungerThan_ReturnsAllExpectedUsers_Test".LogInfo("Starting the test...");
 
@@ -121,17 +126,17 @@ namespace APIAutomation.Tests
                 StepResult step1 = new StepResult { name = "Step#1: Get all users younger than set parameter" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 int youngerThan = 1;
-                _request.AddParameter("youngerThan", youngerThan);
 
-                _client.AddDefaultHeader("Accept", "application/json");
-                RestResponse response = _client.Execute(_request);
+                HttpResponseMessage response = await _client.GetAsync($"/users?youngerThan={youngerThan}");
+                response.EnsureSuccessStatusCode();
+
+                string responseContent = await response.Content.ReadAsStringAsync();
+                List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(responseContent);
                 AllureLifecycle.Instance.StopStep();
 
-                StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the GET response and all recieved filtered (younger than) users correspond to all expected to receive" };
+                StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the GET response and all received filtered (younger than) users correspond to all expected to receive" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
                 var expectedUsers = new List<User> { };
-
-                List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(response.Content);
 
                 Assert.Multiple(() =>
                 {
@@ -144,13 +149,13 @@ namespace APIAutomation.Tests
             }
             catch (Exception ex)
             {
-                "GetFilteredUsersYoungerThan_ReturnsAllExpectedUsers_Test".LogError($"Error occured: {ex.Message}");
+                "GetFilteredUsersYoungerThan_ReturnsAllExpectedUsers_Test".LogError($"Error occurred: {ex.Message}");
             }
         }
 
         [Test]
         [AllureDescription("Test to get all users with certain sex as set parameter")]
-        public void GetFilteredUsersSex_ReturnsAllExpectedUsers_Test()
+        public async Task GetFilteredUsersSex_ReturnsAllExpectedUsers_Test()
         {
             "GetFilteredUsersSex_ReturnsAllExpectedUsers_Test".LogInfo("Starting the test...");
 
@@ -159,20 +164,20 @@ namespace APIAutomation.Tests
                 StepResult step1 = new StepResult { name = "Step#1: Get all users with certain sex as set parameter" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 string sex = "FEMALE";
-                _request.AddParameter("sex", sex);
 
-                _client.AddDefaultHeader("Accept", "application/json");
-                RestResponse response = _client.Execute(_request);
+                HttpResponseMessage response = await _client.GetAsync($"/users?sex={sex}");
+                response.EnsureSuccessStatusCode();
+
+                string responseContent = await response.Content.ReadAsStringAsync();
+                List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(responseContent);
                 AllureLifecycle.Instance.StopStep();
 
-                StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the GET response and all recieved filtered (by sex) users correspond to all expected to receive" };
+                StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the GET response and all received filtered (by sex) users correspond to all expected to receive" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
                 var expectedUsers = new List<User>
                 {
                     new User { Name = "Sophia Miller", Age = 59, Sex = "FEMALE", ZipCode = null }
                 };
-
-                List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(response.Content);
 
                 Assert.Multiple(() =>
                 {
@@ -185,7 +190,7 @@ namespace APIAutomation.Tests
             }
             catch (Exception ex)
             {
-                "GetFilteredUsersSex_ReturnsAllExpectedUsers_Test".LogError($"Error occured: {ex.Message}");
+                "GetFilteredUsersSex_ReturnsAllExpectedUsers_Test".LogError($"Error occurred: {ex.Message}");
             }
         }
 
