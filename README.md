@@ -43,4 +43,4 @@ To generate the report execute in CMD: allure serve allure-results
 
 ## Successful results of run  workflows on GitHub:
 
--	for RestSharp tests: (https://github.com/AKasachova/API_Automation_CSharp/actions/runs/8771076901)
+-	

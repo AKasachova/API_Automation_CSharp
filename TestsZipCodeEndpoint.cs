@@ -17,7 +17,7 @@ namespace APIAutomation.Tests
     public class ZipCodeEndpointGETTests
     {
         private HttpClient _client;
-        private readonly string _baseUrl = "/zip-codes"; 
+        private readonly string _baseUrlZipCodes = "/zip-codes"; 
 
         private static readonly NLog.Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -25,9 +25,9 @@ namespace APIAutomation.Tests
         public void Setup()
         {
             logger.Info("Setting up tests...");
+
             _client = new HttpClient();
-            _client.BaseAddress = new Uri(_baseUrl);
-        }
+         }
 
         [Test]
         [AllureDescription("Test to get all available zip codes in the app for now")]
@@ -40,8 +40,7 @@ namespace APIAutomation.Tests
                 StepResult step1 = new StepResult { name = "Step#1: get all available zip codes in the app for now" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
 
-                HttpResponseMessage response = await _client.GetAsync(_baseUrl);
-                response.EnsureSuccessStatusCode();
+                HttpResponseMessage response = await _client.GetAsync(_baseUrlZipCodes);
 
                 string content = await response.Content.ReadAsStringAsync();
                 List<string> actualZipCodes = JsonConvert.DeserializeObject<List<string>>(content);
@@ -77,7 +76,7 @@ namespace APIAutomation.Tests
         public class ZipCodeEndpointPOSTTests
         {
             private HttpClient _client;
-            private readonly string _baseUrl = "http://your-api-base-url"; // Replace this with your actual API base URL
+            private readonly string _baseUrlExpandZipCodes = "/zip-codes/expand";
 
             private static readonly NLog.Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -86,7 +85,6 @@ namespace APIAutomation.Tests
             {
                 logger.Info("Setting up tests...");
                 _client = new HttpClient();
-                _client.BaseAddress = new Uri(_baseUrl);
             }
 
             private string[] GenerateUniqueZipCodes(int count)
@@ -130,15 +128,14 @@ namespace APIAutomation.Tests
                     string requestBody = JsonConvert.SerializeObject(sentZipCodes);
 
                     var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await _client.PostAsync("/zip-codes/expand", content);
-                    response.EnsureSuccessStatusCode();
+                    HttpResponseMessage response = await _client.PostAsync(_baseUrlExpandZipCodes, content);
 
                     string responseContent = await response.Content.ReadAsStringAsync();
                     string[] actualZipCodes = JsonConvert.DeserializeObject<string[]>(responseContent);
 
                     Assert.Multiple(() =>
                     {
-                        Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.Created));
+                        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
                         Assert.That(sentZipCodes, Is.EquivalentTo(actualZipCodes), "Sent zip codes are not equal to actual zip codes.");
                     });
 
@@ -172,7 +169,7 @@ namespace APIAutomation.Tests
 
                 var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await _client.PostAsync("/zip-codes/expand", content);
+                HttpResponseMessage response = await _client.PostAsync(_baseUrlExpandZipCodes, content);
                 response.EnsureSuccessStatusCode();
 
                 string responseContent = await response.Content.ReadAsStringAsync();
@@ -233,7 +230,7 @@ namespace APIAutomation.Tests
 
                 var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await _client.PostAsync("/zip-codes/expand", content);
+                HttpResponseMessage response = await _client.PostAsync(_baseUrlExpandZipCodes, content);
                 response.EnsureSuccessStatusCode();
 
                 string responseContent = await response.Content.ReadAsStringAsync();
@@ -243,7 +240,7 @@ namespace APIAutomation.Tests
 
                 Assert.Multiple(() =>
                 {
-                    Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.Created));
+                    Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
                     Assert.That(hasDuplicatesForExistingZipCodes, Is.False, "Duplicate zip codes found among the existing zip codes in the received zip codes.");
                 });
 

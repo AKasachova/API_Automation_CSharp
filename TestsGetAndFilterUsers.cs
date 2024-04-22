@@ -1,8 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NLog;
 using NUnit.Allure.Core;
@@ -16,8 +12,8 @@ namespace APIAutomation.Tests
     [AllureSuite("Filter Users")]
     public class GetAndFilterUsersTests
     {
-        private HttpClient _client;
-        private string _baseUrl = "/users"; 
+        private HttpClient _clientForReadScope;
+        private string _baseUrlUsers = "/users"; 
 
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -26,9 +22,8 @@ namespace APIAutomation.Tests
         {
             "GetAndFilterUsersTests".LogInfo("Setting up tests...");
 
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri(_baseUrl);
-        }
+            _clientForReadScope = ClientForReadScope.GetInstance().GetHttpClient();
+         }
 
         [Test]
         [AllureDescription("Test to get all expected users stored in the application for now")]
@@ -40,8 +35,7 @@ namespace APIAutomation.Tests
             {
                 StepResult step1 = new StepResult { name = "Step#1: Get all users stored currently" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
-                HttpResponseMessage response = await _client.GetAsync("_baseUrl");
-                response.EnsureSuccessStatusCode();
+                HttpResponseMessage response = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 string responseContent = await response.Content.ReadAsStringAsync();
                 List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(responseContent);
                 AllureLifecycle.Instance.StopStep();
@@ -85,8 +79,7 @@ namespace APIAutomation.Tests
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 int olderThan = 60;
 
-                HttpResponseMessage response = await _client.GetAsync($"{_baseUrl}?olderThan={olderThan}");
-                response.EnsureSuccessStatusCode();
+                HttpResponseMessage response = await _clientForReadScope.GetAsync($"{_baseUrlUsers}?olderThan={olderThan}");
 
                 string responseContent = await response.Content.ReadAsStringAsync();
                 List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(responseContent);
@@ -127,8 +120,7 @@ namespace APIAutomation.Tests
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 int youngerThan = 1;
 
-                HttpResponseMessage response = await _client.GetAsync($"/users?youngerThan={youngerThan}");
-                response.EnsureSuccessStatusCode();
+                HttpResponseMessage response = await _clientForReadScope.GetAsync($"{_baseUrlUsers}?youngerThan={youngerThan}");
 
                 string responseContent = await response.Content.ReadAsStringAsync();
                 List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(responseContent);
@@ -165,9 +157,8 @@ namespace APIAutomation.Tests
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
                 string sex = "FEMALE";
 
-                HttpResponseMessage response = await _client.GetAsync($"/users?sex={sex}");
-                response.EnsureSuccessStatusCode();
-
+                HttpResponseMessage response = await _clientForReadScope.GetAsync($"{_baseUrlUsers}?sex={sex}");
+  
                 string responseContent = await response.Content.ReadAsStringAsync();
                 List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(responseContent);
                 AllureLifecycle.Instance.StopStep();

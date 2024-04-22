@@ -6,7 +6,6 @@ using NUnit.Allure.Attributes;
 using NUnit.Allure.Core;
 using NUnit.Framework;
 
-
 namespace APIAutomation.Tests
 {
     [TestFixture]
@@ -16,7 +15,9 @@ namespace APIAutomation.Tests
     {
         private HttpClient _clientForReadScope;
         private HttpClient _clientForWriteScope;
-        private string _baseUrl = "YOUR_BASE_URL";
+        private readonly string _baseUrlUsers = "/users";
+        private readonly string _baseUrlZipCodes = "/zip-codes";
+        private readonly string _baseUrlUploadUsers = "/users/upload";
 
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -25,11 +26,8 @@ namespace APIAutomation.Tests
         {
             logger.Info("Setting up tests...");
 
-            _clientForReadScope = new HttpClient();
-            _clientForReadScope.BaseAddress = new Uri(_baseUrl);
-
-            _clientForWriteScope = new HttpClient();
-            _clientForWriteScope.BaseAddress = new Uri(_baseUrl);
+            _clientForReadScope = ClientForReadScope.GetInstance().GetHttpClient();
+            _clientForWriteScope = ClientForWriteScope.GetInstance().GetHttpClient();
         }
 
         [Test]
@@ -43,15 +41,13 @@ namespace APIAutomation.Tests
                 StepResult step1 = new StepResult { name = "Step#1: Get all users" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
 
-                HttpResponseMessage getAllUsersResponse = await _clientForReadScope.GetAsync("/users");
-                getAllUsersResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getAllUsersResponse = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 List<User> initialUsers = JsonConvert.DeserializeObject<List<User>>(await getAllUsersResponse.Content.ReadAsStringAsync());
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step2 = new StepResult { name = "Step#2: Get all available zip codes" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
-                HttpResponseMessage getZipCodesResponse = await _clientForReadScope.GetAsync("/zip-codes");
-                getZipCodesResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getZipCodesResponse = await _clientForReadScope.GetAsync(_baseUrlZipCodes);
                 List<string> availableZipCodes = JsonConvert.DeserializeObject<List<string>>(await getZipCodesResponse.Content.ReadAsStringAsync());
                 AllureLifecycle.Instance.StopStep();
 
@@ -76,14 +72,12 @@ namespace APIAutomation.Tests
                 MultipartFormDataContent content = new MultipartFormDataContent();
                 content.Add(new StreamContent(File.OpenRead(jsonFilePath)), "file", "Users.json");
 
-                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync("/users/upload", content);
-                postResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync(_baseUrlUploadUsers, content);
                 AllureLifecycle.Instance.StopStep();
 
-                StepResult step4 = new StepResult { name = "Step#4: Verify Status Code of the response and all users are replaced with users from file " };
+                StepResult step4 = new StepResult { name = "Step#4: Verify Status Code of the response and all users are replaced with users from file" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step4);
-                HttpResponseMessage getAllUpdatedUsersResponse = await _clientForReadScope.GetAsync("/users");
-                getAllUpdatedUsersResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getAllUpdatedUsersResponse = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 List<User> updatedUsers = JsonConvert.DeserializeObject<List<User>>(await getAllUpdatedUsersResponse.Content.ReadAsStringAsync());
                 var jsonResponse = await getAllUpdatedUsersResponse.Content.ReadAsStringAsync();
                 dynamic responseObject = JsonConvert.DeserializeObject(jsonResponse);
@@ -116,31 +110,30 @@ namespace APIAutomation.Tests
                 StepResult step1 = new StepResult { name = "Step#1: Get all users" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
 
-                HttpResponseMessage getAllUsersResponse = await _clientForReadScope.GetAsync("/users");
-                getAllUsersResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getAllUsersResponse = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 List<User> initialUsers = JsonConvert.DeserializeObject<List<User>>(await getAllUsersResponse.Content.ReadAsStringAsync());
 
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step2 = new StepResult { name = "Step#2: Get all available zip codes and create unavailable" };
-                HttpResponseMessage getZipCodesResponse = await _clientForReadScope.GetAsync("/zip-codes");
-                getZipCodesResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getZipCodesResponse = await _clientForReadScope.GetAsync(_baseUrlZipCodes);
                 List<string> availableZipCodes = JsonConvert.DeserializeObject<List<string>>(await getZipCodesResponse.Content.ReadAsStringAsync());
                 string unavailableZipCode;
                 do
                 {
                     unavailableZipCode = RandomUserGenerator.GenerateRandomZipCode();
-                } while (availableZipCodes.Contains(unavailableZipCode));
+                } 
+                while (availableZipCodes.Contains(unavailableZipCode));
 
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step3 = new StepResult { name = "Step#3: Create file with new users(at least one user has unavailable zip code) and upload it in the service, get response" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step3);
                 List<User> users = new List<User>
-        {
-            new User{Age = RandomUserGenerator.GenerateRandomAge(), Name = RandomUserGenerator.GenerateRandomName(), Sex = RandomUserGenerator.GenerateRandomSex(), ZipCode = availableZipCodes[0]},
-            new User{Age = RandomUserGenerator.GenerateRandomAge(), Name = RandomUserGenerator.GenerateRandomName(), Sex = RandomUserGenerator.GenerateRandomSex(), ZipCode = unavailableZipCode}
-        };
+                {
+                    new User{Age = RandomUserGenerator.GenerateRandomAge(), Name = RandomUserGenerator.GenerateRandomName(), Sex = RandomUserGenerator.GenerateRandomSex(), ZipCode = availableZipCodes[0]},
+                    new User{Age = RandomUserGenerator.GenerateRandomAge(), Name = RandomUserGenerator.GenerateRandomName(), Sex = RandomUserGenerator.GenerateRandomSex(), ZipCode = unavailableZipCode}
+                };
 
                 string currentDirectory = Directory.GetCurrentDirectory();
                 string jsonFilePath = Path.Combine(Directory.GetParent(currentDirectory).Parent.Parent.FullName, "Test_data", "Users.json");
@@ -154,13 +147,12 @@ namespace APIAutomation.Tests
                 MultipartFormDataContent content = new MultipartFormDataContent();
                 content.Add(new StreamContent(File.OpenRead(jsonFilePath)), "file", "Users.json");
 
-                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync("/users/upload", content);
+                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync(_baseUrlUploadUsers, content);
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step4 = new StepResult { name = "Step#4: Verify Status Code of the response and users are not uploaded" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step4);
-                HttpResponseMessage getAllUpdatedUsersResponse = await _clientForReadScope.GetAsync("/users");
-                getAllUpdatedUsersResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getAllUpdatedUsersResponse = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 List<User> updatedUsers = JsonConvert.DeserializeObject<List<User>>(await getAllUpdatedUsersResponse.Content.ReadAsStringAsync());
 
                 Assert.Multiple(() =>
@@ -215,25 +207,23 @@ namespace APIAutomation.Tests
                 StepResult step1 = new StepResult { name = "Step#1: Get all users" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
 
-                HttpResponseMessage getAllUsersResponse = await _clientForReadScope.GetAsync("/users");
-                getAllUsersResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getAllUsersResponse = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 List<User> initialUsers = JsonConvert.DeserializeObject<List<User>>(await getAllUsersResponse.Content.ReadAsStringAsync());
 
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step2 = new StepResult { name = "Step#2: Get all available zip codes" };
-                HttpResponseMessage getZipCodesResponse = await _clientForReadScope.GetAsync("/zip-codes");
-                getZipCodesResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getZipCodesResponse = await _clientForReadScope.GetAsync(_baseUrlZipCodes);
                 List<string> availableZipCodes = JsonConvert.DeserializeObject<List<string>>(await getZipCodesResponse.Content.ReadAsStringAsync());
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step3 = new StepResult { name = "Step#3: Create file with new users(at least one user has missed required field) and upload it in the service, get response" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step3);
                 List<User> users = new List<User>
-        {
-            new User{Age = RandomUserGenerator.GenerateRandomAge(), Name = RandomUserGenerator.GenerateRandomName(), Sex = RandomUserGenerator.GenerateRandomSex(), ZipCode = availableZipCodes[0]},
-            new User{Age = RandomUserGenerator.GenerateRandomAge(), Sex = RandomUserGenerator.GenerateRandomSex(), ZipCode = availableZipCodes[1]}
-        };
+                {
+                    new User{Age = RandomUserGenerator.GenerateRandomAge(), Name = RandomUserGenerator.GenerateRandomName(), Sex = RandomUserGenerator.GenerateRandomSex(), ZipCode = availableZipCodes[0]},
+                    new User{Age = RandomUserGenerator.GenerateRandomAge(), Sex = RandomUserGenerator.GenerateRandomSex(), ZipCode = availableZipCodes[1]}
+                };
 
                 string currentDirectory = Directory.GetCurrentDirectory();
                 string jsonFilePath = Path.Combine(Directory.GetParent(currentDirectory).Parent.Parent.FullName, "Test_data", "Users.json");
@@ -247,12 +237,12 @@ namespace APIAutomation.Tests
                 MultipartFormDataContent content = new MultipartFormDataContent();
                 content.Add(new StreamContent(File.OpenRead(jsonFilePath)), "file", "Users.json");
 
-                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync("/users/upload", content);
+                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync(_baseUrlUploadUsers, content);
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step4 = new StepResult { name = "Step#4: Verify Status Code of the response and users are not uploaded" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step4);
-                HttpResponseMessage getAllUpdatedUsersResponse = await _clientForReadScope.GetAsync("/users");
+                HttpResponseMessage getAllUpdatedUsersResponse = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 getAllUpdatedUsersResponse.EnsureSuccessStatusCode();
                 List<User> updatedUsers = JsonConvert.DeserializeObject<List<User>>(await getAllUpdatedUsersResponse.Content.ReadAsStringAsync());
 
@@ -295,6 +285,7 @@ namespace APIAutomation.Tests
          * 
          * Expected result: initial list of users wasn't updated
          * Actual result: initial list of users was updated: Received list contains the only one user from the file (user with all correct data)*/
+
         [TearDown]
         public void TearDown()
         {

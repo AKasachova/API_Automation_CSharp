@@ -30,5 +30,4 @@
         int zipCode = random.Next(10000, 99999);
         return zipCode.ToString();
     }
-
 }

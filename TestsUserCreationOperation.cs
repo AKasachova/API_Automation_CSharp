@@ -14,6 +14,8 @@ namespace APIAutomation.Tests
     {
         private HttpClient _clientForReadScope;
         private HttpClient _clientForWriteScope;
+        private readonly string _baseUrlUsers = "/users";
+        private readonly string _baseUrlZipCodes = "/zip-codes";
 
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -36,8 +38,7 @@ namespace APIAutomation.Tests
             {
                 StepResult step1 = new StepResult { name = "Step#1: Get all available zip codes and select the first one." };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
-                HttpResponseMessage getZipCodesResponse = await _clientForReadScope.GetAsync("/zip-codes");
-                getZipCodesResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getZipCodesResponse = await _clientForReadScope.GetAsync(_baseUrlZipCodes);
                 List<string> availableZipCodes = JsonConvert.DeserializeObject<List<string>>(await getZipCodesResponse.Content.ReadAsStringAsync());
                 int initialCount = availableZipCodes.Count;
                 string selectedZipCode = availableZipCodes.FirstOrDefault();
@@ -56,8 +57,7 @@ namespace APIAutomation.Tests
                 string newUserJson = JsonConvert.SerializeObject(newUser);
                 StringContent content = new StringContent(newUserJson, System.Text.Encoding.UTF8, "application/json");
 
-                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync("/users", content);
-                postResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync(_baseUrlUsers, content);
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step3 = new StepResult { name = "Step#3: Verify Status Code of the response and user is added to application and chosen zip code is removed from available zip codes." };
@@ -65,8 +65,7 @@ namespace APIAutomation.Tests
                 Assert.That((int)postResponse.StatusCode, Is.EqualTo(201), "Expected status code 201 (Created) but received " + (int)postResponse.StatusCode);
 
                 // GET request to /users endpoint to check if user is added
-                HttpResponseMessage getUsersResponse = await _clientForReadScope.GetAsync("/users");
-                getUsersResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getUsersResponse = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 List<User> userList = JsonConvert.DeserializeObject<List<User>>(await getUsersResponse.Content.ReadAsStringAsync());
                 bool userFound = userList.Any(u => u.Age == newUser.age && u.Name == newUser.name && u.Sex == newUser.sex && u.ZipCode == newUser.zipCode);
 
@@ -74,7 +73,6 @@ namespace APIAutomation.Tests
 
                 // GET request to /zip-codes endpoint to check if selected zip code is removed
                 HttpResponseMessage getUpdatedZipCodesResponse = await _clientForReadScope.GetAsync("/zip-codes");
-                getUpdatedZipCodesResponse.EnsureSuccessStatusCode();
                 List<string> updatedZipCodes = JsonConvert.DeserializeObject<List<string>>(await getUpdatedZipCodesResponse.Content.ReadAsStringAsync());
                 int finalCount = updatedZipCodes.Count;
 
@@ -113,17 +111,14 @@ namespace APIAutomation.Tests
                 string newUserJson = JsonConvert.SerializeObject(newUser);
                 StringContent content = new StringContent(newUserJson, System.Text.Encoding.UTF8, "application/json");
 
-                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync("/users", content);
-                postResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync(_baseUrlUsers, content);
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the response and user is added to application." };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
-                Assert.That((int)postResponse.StatusCode, Is.EqualTo(201), "Expected status code 201 (Created) but received " + (int)postResponse.StatusCode);
+                Assert.That((int)postResponse.StatusCode, Is.EqualTo(201), "Expected staсектор приз на барабанеtus code 201 (Created) but received " + (int)postResponse.StatusCode);
 
-                // GET request to /users endpoint to check if user is added
-                HttpResponseMessage getUsersResponse = await _clientForReadScope.GetAsync("/users");
-                getUsersResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getUsersResponse = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 List<User> userList = JsonConvert.DeserializeObject<List<User>>(await getUsersResponse.Content.ReadAsStringAsync());
                 bool userFound = userList.Any(u => u.Name == newUser.name && u.Sex == newUser.sex);
 
@@ -149,15 +144,15 @@ namespace APIAutomation.Tests
                 StepResult step1 = new StepResult { name = "Step#1: Get all available zip codes and create unavailable." };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
 
-                HttpResponseMessage getZipCodesResponse = await _clientForReadScope.GetAsync("/zip-codes");
-                getZipCodesResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getZipCodesResponse = await _clientForReadScope.GetAsync(_baseUrlZipCodes);
                 List<string> availableZipCodes = JsonConvert.DeserializeObject<List<string>>(await getZipCodesResponse.Content.ReadAsStringAsync());
 
                 string unavailableZipCode;
                 do
                 {
                     unavailableZipCode = RandomUserGenerator.GenerateRandomZipCode();
-                } while (availableZipCodes.Contains(unavailableZipCode));
+                } 
+                while (availableZipCodes.Contains(unavailableZipCode));
 
                 AllureLifecycle.Instance.StopStep();
 
@@ -175,7 +170,7 @@ namespace APIAutomation.Tests
                 string newUserJson = JsonConvert.SerializeObject(newUser);
                 StringContent content = new StringContent(newUserJson, System.Text.Encoding.UTF8, "application/json");
 
-                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync("/users", content);
+                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync(_baseUrlUsers, content);
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step3 = new StepResult { name = "Step#3: Verify Status Code of the response and user is not added to application." };
@@ -184,8 +179,7 @@ namespace APIAutomation.Tests
                 Assert.That((int)postResponse.StatusCode, Is.EqualTo(424), "Expected status code 424 but received " + (int)postResponse.StatusCode);
 
                 // GET request to /users endpoint to check if user is not added
-                HttpResponseMessage getUsersResponse = await _clientForReadScope.GetAsync("/users");
-                getUsersResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getUsersResponse = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 List<User> userList = JsonConvert.DeserializeObject<List<User>>(await getUsersResponse.Content.ReadAsStringAsync());
                 bool userFound = userList.Any(u => u.Age == newUser.age && u.Name == newUser.name && u.Sex == newUser.sex && u.ZipCode == newUser.zipCode);
 
@@ -212,8 +206,7 @@ namespace APIAutomation.Tests
                 StepResult step1 = new StepResult { name = "Step#1: Get existing user and create a new one using its name and sex." };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
 
-                HttpResponseMessage getUsersResponse = await _clientForReadScope.GetAsync("/users");
-                getUsersResponse.EnsureSuccessStatusCode();
+                HttpResponseMessage getUsersResponse = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 List<User> userList = JsonConvert.DeserializeObject<List<User>>(await getUsersResponse.Content.ReadAsStringAsync());
                 var initialUserCount = userList.Count;
                 var userFound = userList.FirstOrDefault();
@@ -232,7 +225,7 @@ namespace APIAutomation.Tests
                 string newUserJson = JsonConvert.SerializeObject(newUser);
                 StringContent content = new StringContent(newUserJson, System.Text.Encoding.UTF8, "application/json");
 
-                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync("/users", content);
+                HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync(_baseUrlUsers, content);
 
                 AllureLifecycle.Instance.StopStep();
 
@@ -242,8 +235,7 @@ namespace APIAutomation.Tests
                 Assert.That((int)postResponse.StatusCode, Is.EqualTo(400), "Expected status code 400 but received " + (int)postResponse.StatusCode);
 
                 // Check if sent user is not added
-                HttpResponseMessage getUsersResponseUpdated = await _clientForReadScope.GetAsync("/users");
-                getUsersResponseUpdated.EnsureSuccessStatusCode();
+                HttpResponseMessage getUsersResponseUpdated = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 List<User> userListUpdated = JsonConvert.DeserializeObject<List<User>>(await getUsersResponseUpdated.Content.ReadAsStringAsync());
                 var finalUserCount = userListUpdated.Count;
 
