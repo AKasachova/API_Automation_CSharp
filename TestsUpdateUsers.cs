@@ -26,7 +26,7 @@ namespace APIAutomation.Tests
             logger.Info("Setting up tests...");
 
             _clientForReadScope = ClientForReadScope.GetInstance().GetHttpClient();
-            _clientForWriteScope = ClientForWriteScope.GetInstance().GetHttpClient();
+            _clientForWriteScope = ClientForReadScope.GetInstance().GetHttpClient();
         }
 
         [Test]

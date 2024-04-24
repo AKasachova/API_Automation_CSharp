@@ -37,7 +37,7 @@ namespace APIAutomation.Tests
             _requestForReadUsers = new HttpRequestMessage(HttpMethod.Get, "/users");
             _requestForReadZipCodes = new HttpRequestMessage(HttpMethod.Get, "/zip-codes");
 
-            _clientForWriteScope = ClientForWriteScope.GetInstance().GetHttpClient();
+            _clientForWriteScope = ClientForReadScope.GetInstance().GetHttpClient();
             _requestForWriteScope = new HttpRequestMessage(HttpMethod.Delete, "/users");
         }
 

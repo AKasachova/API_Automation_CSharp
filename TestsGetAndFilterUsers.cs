@@ -4,6 +4,7 @@ using NLog;
 using NUnit.Allure.Core;
 using NUnit.Allure.Attributes;
 using Allure.Commons;
+using System.Net.Http.Headers;
 
 namespace APIAutomation.Tests
 {
@@ -23,6 +24,7 @@ namespace APIAutomation.Tests
             "GetAndFilterUsersTests".LogInfo("Setting up tests...");
 
             _clientForReadScope = ClientForReadScope.GetInstance().GetHttpClient();
+
          }
 
         [Test]
@@ -35,9 +37,10 @@ namespace APIAutomation.Tests
             {
                 StepResult step1 = new StepResult { name = "Step#1: Get all users stored currently" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
+                _clientForReadScope.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 HttpResponseMessage response = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 string responseContent = await response.Content.ReadAsStringAsync();
-                List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(responseContent);
+                User actualUsers = JsonConvert.DeserializeObject<User>(responseContent);
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the GET response and all recieved users correspond to all expected to receive" };
@@ -64,6 +67,7 @@ namespace APIAutomation.Tests
             catch (Exception ex)
             {
                 "GetAllUsers_ReturnsAllExpectedUsers_Test".LogError($"An error occured: {ex.Message}");
+                Console.WriteLine(ex.StackTrace); // Добавим вывод стека вызовов для дополнительной информации
             }
         }
 
@@ -190,6 +194,7 @@ namespace APIAutomation.Tests
         {
             "GetAndFilterUsersTests".LogInfo("Tearing down tests...");
             LogManager.Shutdown();
+
         }
     }  
 }
