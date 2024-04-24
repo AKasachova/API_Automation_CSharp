@@ -1,5 +1,8 @@
 ﻿
+using System;
+using System.Net.Http;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace APIAutomation
 {
@@ -33,21 +36,11 @@ namespace APIAutomation
                 System.Text.Encoding.UTF8.GetBytes($"{_clientUsername}:{_clientPassword}")
             );
 
-            var requestBody = new
-            {
-                grant_type = "client_credentials",
-                scope = _scope.ToString()
-            };
-
-            var requestContent = new StringContent(
-                JsonSerializer.Serialize(requestBody),
-                System.Text.Encoding.UTF8,
-                "application/json"
-            );
+            var url = $"oauth/token?grant_type=client_credentials&scope={_scope}";
 
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authenticationHeaderValue);
 
-            var response = await client.PostAsync("oauth/token", requestContent);
+            var response = await client.PostAsync(url, null);
             response.EnsureSuccessStatusCode();
 
             var responseContent = await response.Content.ReadAsStringAsync();

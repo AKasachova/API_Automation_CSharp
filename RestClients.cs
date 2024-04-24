@@ -46,7 +46,7 @@ namespace APIAutomation
 
             var client = new HttpClient();
             client.BaseAddress = new Uri(baseUrl);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(token); 
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", token); 
             return client;
         }
     }
@@ -94,7 +94,7 @@ namespace APIAutomation
 
             var client = new HttpClient();
             client.BaseAddress = new Uri(baseUrl);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(token); 
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", token); 
 
             return client;
         }

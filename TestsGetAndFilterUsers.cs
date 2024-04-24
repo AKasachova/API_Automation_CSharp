@@ -37,7 +37,7 @@ namespace APIAutomation.Tests
             {
                 StepResult step1 = new StepResult { name = "Step#1: Get all users stored currently" };
                 AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
-                _clientForReadScope.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                //_clientForReadScope.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 HttpResponseMessage response = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 string responseContent = await response.Content.ReadAsStringAsync();
                 User actualUsers = JsonConvert.DeserializeObject<User>(responseContent);
