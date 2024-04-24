@@ -35,16 +35,16 @@ namespace APIAutomation.Tests
 
             try
             {
-                StepResult step1 = new StepResult { name = "Step#1: Get all users stored currently" };
-                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
-                //_clientForReadScope.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                /*StepResult step1 = new StepResult { name = "Step#1: Get all users stored currently" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);*/
+                _clientForReadScope.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 HttpResponseMessage response = await _clientForReadScope.GetAsync(_baseUrlUsers);
                 string responseContent = await response.Content.ReadAsStringAsync();
-                User actualUsers = JsonConvert.DeserializeObject<User>(responseContent);
-                AllureLifecycle.Instance.StopStep();
+                List<User> actualUsers = JsonConvert.DeserializeObject<List<User>>(responseContent);
+                //AllureLifecycle.Instance.StopStep();
 
-                StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the GET response and all recieved users correspond to all expected to receive" };
-                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
+                /*StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the GET response and all recieved users correspond to all expected to receive" };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);*/
                 var expectedUsers = new List<User>
                 {
                     new User { Name = "Emma Jones", Age = 6, Sex = "MALE", ZipCode = "12345" },
@@ -62,13 +62,12 @@ namespace APIAutomation.Tests
                 });
 
                 "GetAllUsers_ReturnsAllExpectedUsers_Test".LogInfo("The test completed successfully.");
-                AllureLifecycle.Instance.StopStep();
+                //AllureLifecycle.Instance.StopStep();
             }
             catch (Exception ex)
             {
                 "GetAllUsers_ReturnsAllExpectedUsers_Test".LogError($"An error occured: {ex.Message}");
-                Console.WriteLine(ex.StackTrace); // Добавим вывод стека вызовов для дополнительной информации
-            }
+             }
         }
 
         [Test]
@@ -80,7 +79,7 @@ namespace APIAutomation.Tests
             try
             {
                 StepResult step1 = new StepResult { name = "Step#1: Get all users older than set parameter" };
-                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
+                AllureLifecycle.Instance.StartStep("Step#1: Get all users older than set parameter", step1);
                 int olderThan = 60;
 
                 HttpResponseMessage response = await _clientForReadScope.GetAsync($"{_baseUrlUsers}?olderThan={olderThan}");
@@ -90,7 +89,7 @@ namespace APIAutomation.Tests
                 AllureLifecycle.Instance.StopStep();
 
                 StepResult step2 = new StepResult { name = "Step#2: Verify Status Code of the GET response and all received filtered (older than) users correspond to all expected to receive" };
-                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
+                AllureLifecycle.Instance.StartStep("Step#2: Verify Status Code of the GET response and all received filtered (older than) users correspond to all expected to receive", step2);
                 var expectedUsers = new List<User>
                 {
                     new User { Name = "James Davis", Age = 73, Sex = "MALE", ZipCode = "23456" },

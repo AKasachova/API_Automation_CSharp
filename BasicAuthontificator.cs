@@ -41,12 +41,11 @@ namespace APIAutomation
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authenticationHeaderValue);
 
             var response = await client.PostAsync(url, null);
-            response.EnsureSuccessStatusCode();
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseContent);
 
-            return $"{tokenResponse.TokenType} {tokenResponse.AccessToken}";
+            return $"{tokenResponse.AccessToken}";
         }
     }
 }

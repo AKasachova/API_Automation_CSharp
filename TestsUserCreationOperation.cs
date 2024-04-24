@@ -36,16 +36,16 @@ namespace APIAutomation.Tests
 
             try
             {
-                StepResult step1 = new StepResult { name = "Step#1: Get all available zip codes and select the first one." };
-                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
+                /*StepResult step1 = new StepResult { name = "Step#1: Get all available zip codes and select the first one." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);*/
                 HttpResponseMessage getZipCodesResponse = await _clientForReadScope.GetAsync(_baseUrlZipCodes);
                 List<string> availableZipCodes = JsonConvert.DeserializeObject<List<string>>(await getZipCodesResponse.Content.ReadAsStringAsync());
                 int initialCount = availableZipCodes.Count;
                 string selectedZipCode = availableZipCodes.FirstOrDefault();
-                AllureLifecycle.Instance.StopStep();
+                //AllureLifecycle.Instance.StopStep();
 
-                StepResult step2 = new StepResult { name = "Step#2: Send created user with available zip code and receive respond." };
-                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);
+                /*StepResult step2 = new StepResult { name = "Step#2: Send created user with available zip code and receive respond." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step2);*/
                 var newUser = new
                 {
                     age = RandomUserGenerator.GenerateRandomAge(),
@@ -58,10 +58,10 @@ namespace APIAutomation.Tests
                 StringContent content = new StringContent(newUserJson, System.Text.Encoding.UTF8, "application/json");
 
                 HttpResponseMessage postResponse = await _clientForWriteScope.PostAsync(_baseUrlUsers, content);
-                AllureLifecycle.Instance.StopStep();
+                //AllureLifecycle.Instance.StopStep();
 
-                StepResult step3 = new StepResult { name = "Step#3: Verify Status Code of the response and user is added to application and chosen zip code is removed from available zip codes." };
-                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step3);
+                /*StepResult step3 = new StepResult { name = "Step#3: Verify Status Code of the response and user is added to application and chosen zip code is removed from available zip codes." };
+                AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step3);*/
                 Assert.That((int)postResponse.StatusCode, Is.EqualTo(201), "Expected status code 201 (Created) but received " + (int)postResponse.StatusCode);
 
                 // GET request to /users endpoint to check if user is added

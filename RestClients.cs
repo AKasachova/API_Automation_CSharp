@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Headers;
 using NUnit.Framework;
-using System;
 
 namespace APIAutomation
 {
@@ -23,11 +22,12 @@ namespace APIAutomation
                 {
                     if (_instance == null)
                     {
-                        var baseUrlParam = TestContext.Parameters["BaseUrl"];
-                        var clientUsernameParam = TestContext.Parameters["ClientUsername"];
-                        var clientPasswordParam = TestContext.Parameters["ClientPassword"];
+                        var baseUrl = TestContext.Parameters["BaseUrl"];
+                        var clientUsername = TestContext.Parameters["ClientUsername"];
+                        var clientPassword = TestContext.Parameters["ClientPassword"];
 
-                        _instance = new ClientForReadScope(CreateHttpClient(baseUrlParam, clientUsernameParam, clientPasswordParam, Scope.read));
+                        _instance = new ClientForReadScope(CreateHttpClient(baseUrl, clientUsername, clientPassword));
+
                     }
                 }
             }
@@ -39,14 +39,14 @@ namespace APIAutomation
             return _client;
         }
 
-        private static HttpClient CreateHttpClient(string baseUrl, string clientUsername, string clientPassword, Scope scope)
+        private static HttpClient CreateHttpClient(string baseUrl, string clientUsername, string clientPassword)
         {
-            var authenticator = new BasicAuthenticator(baseUrl, clientUsername, clientPassword, scope);
+            var authenticator = new BasicAuthenticator(baseUrl, clientUsername, clientPassword, Scope.read);
             var token = authenticator.GetToken().Result;
 
             var client = new HttpClient();
             client.BaseAddress = new Uri(baseUrl);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", token); 
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token); 
             return client;
         }
     }
@@ -70,11 +70,11 @@ namespace APIAutomation
                 {
                     if (_instance == null)
                     {
-                        var baseUrlParam = TestContext.Parameters["BaseUrl"];
-                        var clientUsernameParam = TestContext.Parameters["ClientUsername"];
-                        var clientPasswordParam = TestContext.Parameters["ClientPassword"];
+                        var baseUrl = TestContext.Parameters["BaseUrl"];
+                        var clientUsername = TestContext.Parameters["ClientUsername"];
+                        var clientPassword = TestContext.Parameters["ClientPassword"];
 
-                        _instance = new ClientForWriteScope(CreateHttpClient(baseUrlParam, clientUsernameParam, clientPasswordParam, Scope.write));
+                        _instance = new ClientForWriteScope(CreateHttpClient(baseUrl, clientUsername, clientPassword));
                     }
                 }
             }
@@ -87,14 +87,14 @@ namespace APIAutomation
             return _client;
         }
 
-        private static HttpClient CreateHttpClient(string baseUrl, string clientUsername, string clientPassword, Scope scope)
+        private static HttpClient CreateHttpClient(string baseUrl, string clientUsername, string clientPassword)
         {
-            var authenticator = new BasicAuthenticator(baseUrl, clientUsername, clientPassword, scope);
+            var authenticator = new BasicAuthenticator(baseUrl, clientUsername, clientPassword, Scope.write);
             var token = authenticator.GetToken().Result;
 
             var client = new HttpClient();
             client.BaseAddress = new Uri(baseUrl);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", token); 
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token); 
 
             return client;
         }

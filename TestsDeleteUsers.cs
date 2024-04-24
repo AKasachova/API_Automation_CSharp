@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using NLog;
 using NUnit.Allure.Attributes;
 using NUnit.Allure.Core;
-using System.Text;
 
 namespace APIAutomation.Tests
 {
