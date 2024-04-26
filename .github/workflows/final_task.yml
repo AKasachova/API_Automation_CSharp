@@ -22,9 +22,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Restore NuGet packages for XSLT processing
-        run: nuget restore tools/xslt/packages.config
-        working-directory: tools/xslt
+      - name: Restore dependencies
+        run: dotnet restore 
 
       - name: Build framework
         run: dotnet build --configuration Release
