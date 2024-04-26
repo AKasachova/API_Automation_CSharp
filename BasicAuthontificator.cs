@@ -45,7 +45,7 @@ namespace APIAutomation
             var responseContent = await response.Content.ReadAsStringAsync();
             var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseContent);
 
-            return $"{tokenResponse.AccessToken}";
+            return $"{tokenResponse!.AccessToken}";
         }
     }
 }

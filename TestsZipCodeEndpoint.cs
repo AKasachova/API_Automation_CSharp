@@ -121,14 +121,14 @@ namespace APIAutomation.Tests
 
                 try
                 {
-                    StepResult step1 = new StepResult { name = "Step#1: Generate unique zip codes and send them to the service and receive response" };
-                    AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);
+                    /*StepResult step1 = new StepResult { name = "Step#1: Generate unique zip codes and send them to the service and receive response" };
+                    AllureLifecycle.Instance.StartStep(TestContext.CurrentContext.Test.Name, step1);*/
 
                     string[] sentZipCodes = GenerateUniqueZipCodes(6);
                     string requestBody = JsonConvert.SerializeObject(sentZipCodes);
 
                     var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await _client.PostAsync(_baseUrlExpandZipCodes, content);
+                    HttpResponseMessage response = await _client.PostAsync("zip-codes/expand", content);
 
                     string responseContent = await response.Content.ReadAsStringAsync();
                     string[] actualZipCodes = JsonConvert.DeserializeObject<string[]>(responseContent);
@@ -144,7 +144,7 @@ namespace APIAutomation.Tests
                     AllureLifecycle.Instance.AddAttachment("Request Payload", "application/json", tempFilePath);
 
                     logger.Info("PostZipCodes_ReturnsAllAddedZipCodes_Test completed successfully.");
-                    AllureLifecycle.Instance.StopStep();
+                    //AllureLifecycle.Instance.StopStep();
                 }
                 catch (Exception ex)
                 {

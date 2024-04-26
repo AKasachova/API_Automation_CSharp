@@ -9,7 +9,7 @@ using System.Text;
 namespace APIAutomation.Tests
 {
     [TestFixture]
-    [AllureNUnit]
+    //[AllureNUnit]
     [AllureSuite("Update Users")]
     public class UpdateUsersTests
     {
