@@ -22,15 +22,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Restore NuGet packages for XSLT processing
-        run: nuget restore tools/xslt/packages.config
-        working-directory: tools/xslt
+      - name: Restore dependencies
+        run: dotnet restore APIAutomation.csproj  
 
       - name: Build framework
-        run: dotnet build --configuration Release
+        run: dotnet build --configuration Release 
 
       - name: Execute tests
-        run: dotnet test --configuration Release
+        run: dotnet test --configuration Release --settings TestSettings.runsettings
 
       - name: Load test report history
         uses: actions/checkout@v4
