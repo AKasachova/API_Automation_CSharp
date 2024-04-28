@@ -5,9 +5,5 @@
         <Parameter name="ClientUsername" value="0oa157tvtugfFXEhU4x7" />
         <Parameter name="ClientPassword" value="X7eBCXqlFC7x-mjxG5H91IRv_Bqe1oq7ZwXNA8aq" />
     </TestRunParameters>
-
-	<RunConfiguration>
-		<TestCaseFilter>FullyQualifiedName=APIAutomation.Tests.DeleteUsersTests.DeleteAnyUser_CheckTheUserWasDeleted_Test</TestCaseFilter>
-	</RunConfiguration>
 </RunSettings>
 
