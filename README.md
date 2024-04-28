@@ -39,3 +39,6 @@ Open NuGet Manager and add required dependencies for this project. Dependencies 
 
 ## Allure report
 To generate the report execute in CMD: allure serve allure-results
+
+## Sucessfull workflow run:
+https://github.com/AKasachova/API_Automation_CSharp/actions/runs/8866694073
